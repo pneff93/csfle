@@ -1,6 +1,6 @@
-# Client Side Field Level Encryption
+# Client-Side Field Level Encryption (CSFLE)
 
-This repository provides a step by step demo of the Confluent Cloud feature [Client Side Field Level Encryption](http://staging-docs-independent.confluent.io.s3-website-us-west-2.amazonaws.com/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
+This repository provides a step by step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](http://staging-docs-independent.confluent.io/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
 
 Once GA, it is planned to have different branches containing (at least)

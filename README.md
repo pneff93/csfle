@@ -4,9 +4,8 @@ This repository provides a step by step demo of the Confluent Cloud feature [Cli
 As of today, this feature is in Early Access Program.
 
 Once GA, it is planned to have different branches containing (at least)
-- [x] Azure Key Vault without Confluent access to the Key Encryption Key
-- [ ] Azure Key Vault with Confluent access to the Key Encryption Key
-- [ ] HashiCorp Vault with Confluent access to the Key Encryption Key
+- [x] Azure Key Vault
+- [x] HashiCorp Vault
 
 ## Prerequisites
 
@@ -35,7 +34,7 @@ producer and consumer application with Kotlin.
 We first need to create a tag on which we apply the encryption later, such as `PII`.
 As of today, we need to create the tag in the Stream Catalog first, see the [documentation](https://docs.confluent.io/platform/current/schema-registry/fundamentals/data-contracts.html#tags) of Data Contracts.
 
-## Azure Key Vault without Confluent access to the Key Encryption Key
+## Azure Key Vault
 
 ### Azure App registration
 

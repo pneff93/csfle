@@ -1,9 +1,9 @@
 # Client-Side Field Level Encryption (CSFLE)
 
-This repository provides a step by step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](http://staging-docs-independent.confluent.io/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
+This repository provides several demos of the Confluent Cloud feature [Client-Side Field Level Encryption](http://staging-docs-independent.confluent.io/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
 
-This repository covers step-by-step guidelines for different KMS via branches:
+It covers step-by-step guidelines for different KMS via branches:
 - [x] [Azure Key Vault](https://github.com/pneff93/csfle/tree/azure)
 - [x] [HashiCorp Vault](https://github.com/pneff93/csfle/tree/hashicorp)
 - [ ] AWS Secrets Manager

@@ -50,10 +50,6 @@ After your Key has been created, navigate to AWS IAM and create an Access Key fo
 
 :warning: **Important:** Ensure you copy your Access Key ID and Secret (or download the csv file) :warning:
 
-## Update the Producer and Consumer Properties Files
-
-Update the `rule.executors._default_.param.access.key.id` and `rule.executors._default_.param.secret.access.key` properties for the Producer and Consumer with the Access Key and Secret you retrieved in the previous step.
-
 ## Register Schema
 
 We register the schema with setting `PII` to the birthday field and define the encryption rule

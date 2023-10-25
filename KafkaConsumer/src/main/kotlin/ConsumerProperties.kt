@@ -27,11 +27,9 @@ class ConsumerProperties {
         settings.setProperty("basic.auth.credentials.source", "USER_INFO")
         settings.setProperty("schema.registry.basic.auth.user.info", "CC Schema Register Api:Key")
 
-        // Encryption + GCP Service Account Credentials
-        settings.setProperty("rule.executors._default_.param.client.id", "<GCP Client ID>")
-        settings.setProperty("rule.executors._default_.param.client.email", "<GCP Client Email>")
-        settings.setProperty("rule.executors._default_.param.private.key.id", "<GCP Private Key ID>")
-        settings.setProperty("rule.executors._default_.param.private.key", "GCP Private Key Material")
+        // Encryption + AWS Credentials
+        settings.setProperty("rule.executors._default_.param.access.key.id", "<AWS User Access Key ID>")
+        settings.setProperty("rule.executors._default_.param.secret.access.key", "AWS User Access Key Secret")
 
         return settings
     }

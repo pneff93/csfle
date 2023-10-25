@@ -1,4 +1,4 @@
-# Client-Side Field Level Encryption (CSFLE) with Google KMS
+# Client-Side Field Level Encryption (CSFLE) with AWS KMS
 
 This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](http://staging-docs-independent.confluent.io/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
@@ -10,7 +10,7 @@ As of today, this feature is in Early Access Program.
 
 ## Goal
 
-We will to produce personal data to Confluent Cloud in the following form 
+We will produce personal data to Confluent Cloud in the following form 
 ```
 {
     "id": "0",
@@ -30,33 +30,33 @@ producer and consumer application with Kotlin.
 We first need to create a tag on which we apply the encryption later, such as `PII`.
 As of today, we need to create the tag in the Stream Catalog first, see the [documentation](https://docs.confluent.io/platform/current/schema-registry/fundamentals/data-contracts.html#tags) of Data Contracts.
 
-## Google KMS
+## AWS KMS
 
-Create a Key Ring and add a key to it. Copy the key's resource name as shown.
+In the KMS section of the AWS Management Console, create a new Symmetric Key with Encrypt/Decrypt configuration
 
-![](images/create_keyring.jpg)
+![](images/aws_create_key.jpg)
 
-![](images/create_key.jpg)
+![](images/aws_key_config.jpg)
 
-![](images/key_resource_name.jpg)
+As you click through this process you will be asked to define `Admins` and `Users` for your key. Ensure you grant access to the `User` that you want use in your Producer/Consumer app.
 
-:warning: **Important:** Ensure you grant your Service Account the `Cloud KMS CryptoKey Encrypter/Decrypter` role on the Google KMS key you just created. Otherwise you will not be able to use the key to Encrypt/Decrypt your data!
+![](images/aws_key_users.jpg)
 
-![](images/gcp_kms_grant_role.jpg)
+## AWS IAM
 
-## Download Service Account Credentials
+After your Key has been created, navigate to AWS IAM and create an Access Key for the User that you granted permissions to in the previous step.
 
-Download the JSON credentials file for the service account you'd like to use (If you don't already have one, just create a new Key in JSON format and it will automatically be downloaded to your computer). 
+![](images/aws_create_access_key.jpg)
 
-You will use the content found here in the Producer/Consumer properties files for `client.id`, `client.email`, `private.key.id`, and `private.key`
+:warning: **Important:** Ensure you copy your Access Key ID and Secret (or download the csv file) :warning:
 
-![](images/create_SA_Key.jpg)
+## Update the Producer and Consumer Properties Files
 
-![](images/create_json.jpg)
+Update the `rule.executors._default_.param.access.key.id` and `rule.executors._default_.param.secret.access.key` properties for the Producer and Consumer with the Access Key and Secret you retrieved in the previous step.
 
 ## Register Schema
 
-We register the schema with setting `PII` to the birthday field and defining the encryption rule
+We register the schema with setting `PII` to the birthday field and define the encryption rule
 
 ```shell
 curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/subjects/dgingera-csfle-demo-value/versions'   \
@@ -75,6 +75,12 @@ curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/s
 ```
 ## Register Rule
 
+Go to AWS KMS and copy the ARN of the key you previously created. We need this ARN to register our encryption rule below.
+
+![](images/aws_key_arn.jpg)
+
+Then, run the following curl to register the rule in Schema Registry. Alternatively, you can do this through the CC UI `Encryption Rules` section.
+
 ```shell
 curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/subjects/dgingera-csfle-demo-value/versions' --header 'Authorization: Basic <base64 encoded SR Key:Secret>' --header 'Content-Type: application/vnd.schemaregistry.v1+json' \
   --data '{
@@ -87,9 +93,9 @@ curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/s
         "mode": "WRITEREAD",
         "tags": ["PII"],
         "params": {
-           "encrypt.kek.name": "dgingera-csfle-gcp",
-           "encrypt.kms.key.id": "<GCP Key ID>",
-           "encrypt.kms.type": "gcp-kms"
+           "encrypt.kek.name": "<AWS KMS Key Name>",
+           "encrypt.kms.key.id": "<AWS KMS Key ARN>",
+           "encrypt.kms.type": "aws-kms"
           },
         "onFailure": "ERROR,NONE"
         }
@@ -113,17 +119,15 @@ or in the CC UI
 We need to add
 ```shell
 implementation("io.confluent:kafka-avro-serializer:7.5.1")
-implementation("io.confluent:kafka-schema-registry-client-encryption-gcp:7.5.1")
+implementation("io.confluent:kafka-schema-registry-client-encryption-aws:7.5.1")
 ```
 
 ### Producer
-We need to adjust the configuration by adding
+We need to adjust the configuration by updating the following in the Producer/Consumer props files
 ```kotlin
-// Encryption + GCP Creds (Note: All credential info can be found in your Service account's credential JSON file we downloaded in the earlier step)
-settings.setProperty("rule.executors._default_.param.client.id", "<GCP Client ID>")
-settings.setProperty("rule.executors._default_.param.client.email", "GCP Client Email")
-settings.setProperty("rule.executors._default_.param.private.key.id", "<GCP Private Key ID>")
-settings.setProperty("rule.executors._default_.param.private.key", "<GCP Private Key Material>")
+// Encryption + AWS Credentials (this is the access key we created in the IAM section of this tutorial)
+settings.setProperty("rule.executors._default_.param.access.key.id", "<AWS User Access Key ID>")
+settings.setProperty("rule.executors._default_.param.secret.access.key", "<AWS User Access Key Secret>")
 
 // Required since we manually create schemas
 settings.setProperty("use.latest.version", "true")

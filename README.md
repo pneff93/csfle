@@ -16,7 +16,7 @@ It covers step-by-step guidelines for different KMS via branches:
 
 ## Goal
 
-We will to produce personal data to Confluent Cloud in the following form 
+We will produce personal data to Confluent Cloud in the following form 
 ```
 {
     "id": "0",

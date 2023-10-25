@@ -6,7 +6,7 @@ As of today, this feature is in Early Access Program.
 It covers step-by-step guidelines for different KMS via branches:
 - [x] [Azure Key Vault](https://github.com/pneff93/csfle/tree/azure)
 - [x] [HashiCorp Vault](https://github.com/pneff93/csfle/tree/hashicorp)
-- [ ] AWS Secrets Manager
+- [x] [AWS KMS](https://github.com/pneff93/csfle/tree/aws)
 - [x] [GCP KMS](https://github.com/pneff93/csfle/tree/gcp)
 
 ## Prerequisites

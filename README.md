@@ -34,9 +34,9 @@ As of today, we need to create the tag in the Stream Catalog first, see the [doc
 
 In the KMS section of the AWS Management Console, create a new Symmetric Key with Encrypt/Decrypt configuration
 
-![](images/aws_create_key.jpg)
+![](images/aws_create_key.png)
 
-![](images/aws_iam_access_key.jpg)
+![](images/aws_iam_access_key.png)
 
 ### Optional - KMS User (ServiceAccount) registration
 As you click through this process you will be asked to define `Admins` and `Users` for your key. 
@@ -45,16 +45,16 @@ There is no need to grant access to a user `User` (ServiceAccount) in order to t
 However, if you want to test as well [KMS access toggling feature](#toggling-master-key-sharing), please grant access to a User and then navigate to AWS IAM by creating an Access Key for the same User.
 
 
-![](images/aws_key_users.jpg)
+![](images/aws_key_users.png)
 
-![](images/aws_key_config.jpg)
+![](images/aws_key_config.png)
 
 ## Retrieving AWS KMS key ARN
 
 Finally go to AWS KMS section again and copy the ARN of the key you previously created. We need this ARN to register our encryption rule below
 
 
-![](images/aws_key_arn.jpg)
+![](images/aws_key_arn.png)
 
 ## Preliminary parameters configuration
 
@@ -184,7 +184,7 @@ curl  --url "${SR_URL}/dek-registry/v1/policy"  --header "Authorization: Basic $
 
 Go back in the KMS key policy configuration on AWS.  Press on "Switch to policy view" button and add permission statements in your AWS KMS policy
 
-![](images/aws_register_confluent_permission_statements.jpg)
+![](images/aws_register_confluent_permission_statements.png)
 
 
 ## Run the Producer
@@ -204,7 +204,7 @@ We can see in the logs that everything is working fine
 
 or check the encrypted field messages in the CC UI
 
-![](images/cc_ui_consume.jpg)
+![](images/cc_ui_consume.png)
 
 ## Run the Consumer (Gradle)
 

@@ -21,7 +21,7 @@ class ProducerProperties {
         val schema_registry_url: String = System.getenv("SR_URL") ?: "<CC Schema Registry URL>"
         val schema_registry_credentials: String = System.getenv("SR_CRED") ?: "<CC Schema Register Api Key:Secret>"
         /*
-        Uncomment this if you want to try the non-shared KEK flow, in this scenario che clients requires KMS access
+        Uncomment this if you want to try the non-shared KEK flow, in this scenario the clients requires KMS access
 
         val aws_api_key: String = System.getenv("AWS_ACCESS_KEY_ID") ?: "<AWS_ACCESS_KEY_ID>"
         val aws_api_secret: String = System.getenv("AWS_SECRET_ACCESS_KEY") ?: "AWS_SECRET_ACCESS_KEY>"

@@ -72,3 +72,5 @@ gradle-app.setting
 *.env
 
 .idea/
+**/bin/
+

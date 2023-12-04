@@ -8,6 +8,7 @@ It covers step-by-step guidelines for different KMS via branches:
 - [x] [HashiCorp Vault](https://github.com/pneff93/csfle/tree/hashicorp)
 - [x] [AWS KMS](https://github.com/pneff93/csfle/tree/aws)
 - [x] [GCP KMS](https://github.com/pneff93/csfle/tree/gcp)
+- [x] [AWS KMS - Shared KEK](https://github.com/pneff93/csfle/tree/aws_shared_kek)
 
 ## Prerequisites
 

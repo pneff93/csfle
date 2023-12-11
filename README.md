@@ -4,11 +4,11 @@ This repository provides several demos of the Confluent Cloud feature [Client-Si
 As of today, this feature is in Early Access Program.
 
 It covers step-by-step guidelines for different KMS via branches:
-- [x] [Azure Key Vault](https://github.com/pneff93/csfle/tree/azure)
-- [x] [HashiCorp Vault](https://github.com/pneff93/csfle/tree/hashicorp)
-- [x] [AWS KMS](https://github.com/pneff93/csfle/tree/aws)
-- [x] [GCP KMS](https://github.com/pneff93/csfle/tree/gcp)
-- [x] [AWS KMS - Shared KEK](https://github.com/pneff93/csfle/tree/aws_shared_kek)
+- [x] [Azure Key Vault](azure/README.md)
+- [x] [HashiCorp Vault](hashicorp/README.md)
+- [x] [AWS KMS](aws/README.md)
+- [x] [GCP KMS](gcp/README.md)
+- [x] [AWS KMS - Shared KEK](aws_shared_kek/README.md)
 
 ## Prerequisites
 

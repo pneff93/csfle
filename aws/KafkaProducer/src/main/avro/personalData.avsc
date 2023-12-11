@@ -1,0 +1,26 @@
+{
+  "name": "PersonalData",
+  "type": "record",
+  "namespace": "com.csfleExample",
+  "fields": [
+     {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "birthday",
+          "type": "string"
+        },
+        {
+      "name": "timestamp",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  ]
+}

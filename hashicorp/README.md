@@ -11,7 +11,8 @@ As of today, this feature is in Early Access Program.
 
 ## Goal
 
-We will produce personal data to Confluent Cloud in the following form 
+We will produce personal data to Confluent Cloud in the following form
+
 ```
 {
     "id": "0",
@@ -20,6 +21,7 @@ We will produce personal data to Confluent Cloud in the following form
     "timestamp": "2023-10-07T19:54:21.884Z"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the `birthday` field.
 We then start a consumer with the corresponding configurations to decrypt the field again.
 
@@ -44,11 +46,10 @@ Under enable new secret engine we create a transit and a key.
 
 ![](HCVaultKey.png)
 
-
-
 ## Set up credentials and register schema
 
-We register the schema with setting `PII` to the birthday field and defining the encryption rule
+We register the schema with setting `PII` to the birthday field and defining the encryption rule.
+First, get the REST endpoint for your Confluent cluster from the Web UI and set it to a variable. Set another value to the topic name you use in `client.properties`:
 
 ```shell
 
@@ -68,7 +69,6 @@ If you want to e.g. list your topics, you can use curl:
 curl --request GET --url $KAFKA_CLUSTER_REST_ENDPOINT/kafka/v3/clusters/$KAFKA_CLUSTER_ID/topics -u "$API_KEY:$API_SECRET" | jq
 ```
 
-
 Then we can create the schema:
 
 ```shell
@@ -80,12 +80,13 @@ curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions"
             "schema": "{  \"name\": \"PersonalData\", \"type\": \"record\", \"namespace\": \"com.csfleExample\", \"fields\": [{\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"name\", \"type\": \"string\"},{\"name\": \"birthday\", \"type\": \"string\", \"confluent:tags\": [ \"PII\"]},{\"name\": \"timestamp\",\"type\": [\"string\", \"null\"]}]}",
             "metadata": {
             "properties": {
-            "owner": "Patrick Neff",
-            "email": "pneff@confluent.io"
+            "owner": "Confluent User",
+            "email": "confluent@example.com"
             }
           }
     }' 
 ```
+
 ## Register Rule
 
 ```shell
@@ -114,6 +115,7 @@ curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions"
 ```
 
 We can check that everything is registered correctly by either executing
+
 ```shell
 curl --request GET \
   --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions/latest" \

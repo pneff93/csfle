@@ -1,2 +1,6 @@
 */Kafka*/build/*
 !*/Kafka*/build/generated*/
+*/Kafka*/.gradle
+*/Kafka*/.java-version
+api-key*.txt
+client.properties

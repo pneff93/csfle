@@ -48,19 +48,28 @@ Under enable new secret engine we create a transit and a key.
 
 ## Register Schema
 
-We register the schema with setting `PII` to the birthday field and defining the encryption rule
+We register the schema with setting `PII` to the birthday field and defining the encryption rule.
+First, get the REST endpoint for your Confluent cluster from the Web UI and set it to a variable. Set another value to the topic name you use in `client.properties`:
 
 ```shell
-curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-csfle-test-value/versions'   \
-  --header 'Authorization: Basic <SR API Key>:<SR API Secret>' \ <-- base64 encoded credentials
+export REST_ENDPOINT="<YOUR-REST-ENDPOINT>"
+export TOPIC="csfle-test-aabbccdd"
+export SR_API_KEY=$(echo -n "<put your SR API Key here>:<put your SR API secret here>" | base64)
+```
+
+Then we can create the schema:
+
+```shell
+curl --request POST --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions"   \
+  --header "Authorization: Basic ${SR_API_KEY}" \
   --header 'content-type: application/octet-stream' \
   --data '{
             "schemaType": "AVRO",
             "schema": "{  \"name\": \"PersonalData\", \"type\": \"record\", \"namespace\": \"com.csfleExample\", \"fields\": [{\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"name\", \"type\": \"string\"},{\"name\": \"birthday\", \"type\": \"string\", \"confluent:tags\": [ \"PII\"]},{\"name\": \"timestamp\",\"type\": [\"string\", \"null\"]}]}",
             "metadata": {
             "properties": {
-            "owner": "Patrick Neff",
-            "email": "pneff@confluent.io"
+            "owner": "Confluent User",
+            "email": "confluent@example.com"
             }
           }
     }' 
@@ -68,8 +77,8 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
 ## Register Rule
 
 ```shell
-curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-csfle-test-value/versions'   \
-  --header 'Authorization: Basic <SR API Key>:<SR API Secret>' \ <-- base64 encoded credentials
+curl --request POST --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions" \
+  --header "Authorization: Basic ${SR_API_KEY}" \
   --header 'Content-Type: application/vnd.schemaregistry.v1+json' \
   --data '{
         "ruleSet": {
@@ -95,8 +104,8 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
 We can check that everything is registered correctly by either executing
 ```shell
 curl --request GET \
-  --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-csfle-test-value/versions/latest'   \
-  --header 'Authorization: Basic <SR API Key>:<SR API Secret>' \ <-- base64 encoded credentials | jq
+  --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions/latest" \
+  --header "Authorization: Basic ${SR_API_KEY}" | jq
 ```
 
 or in the CC UI

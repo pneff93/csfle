@@ -89,13 +89,8 @@ curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions"
 ## Register Rule
 
 ```shell
-<<<<<<< HEAD
 curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions" \
   --user "${SR_API_KEY}:${SR_API_SECRET}" \
-=======
-curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-csfle-test-value/versions'   \
-  --header 'Authorization: Basic <SR API Key>:<SR API Secret>' \ <-- base64 encoded credentials
->>>>>>> cc5e157 (Integrated all examples into main branch)
   --header 'Content-Type: application/vnd.schemaregistry.v1+json' \
   --data '{
         "ruleSet": {

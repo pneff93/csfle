@@ -46,22 +46,34 @@ Under enable new secret engine we create a transit and a key.
 
 
 
-## Register Schema
+## Set up credentials and register schema
 
 We register the schema with setting `PII` to the birthday field and defining the encryption rule.
 First, get the REST endpoint for your Confluent cluster from the Web UI and set it to a variable. Set another value to the topic name you use in `client.properties`:
 
 ```shell
-export REST_ENDPOINT="<YOUR-REST-ENDPOINT>"
+export KAFKA_CLUSTER_REST_ENDPOINT="<YOUR-REST-ENDPOINT>"
+export KAFKA_CLUSTER_ID="<ID OF YOUR CLUSTER>"
+export API_KEY="<Your Cluster API Key>"
+export API_SECRET="<Your Cluster API Secret>"
 export TOPIC="csfle-test-aabbccdd"
-export SR_API_KEY=$(echo -n "<put your SR API Key here>:<put your SR API secret here>" | base64)
+export SR_REST_ENDPOINT="<Schema Registry REST Endpoint>"
+export SR_API_KEY="<put your SR API Key here>"
+export SR_API_SECRET=":<put your SR API secret here>"
 ```
+
+If you want to e.g. list your topics, you can use curl:
+
+```shell
+curl --request GET --url $KAFKA_CLUSTER_REST_ENDPOINT/kafka/v3/clusters/$KAFKA_CLUSTER_ID/topics -u "$API_KEY:$API_SECRET" | jq
+```
+
 
 Then we can create the schema:
 
 ```shell
-curl --request POST --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions"   \
-  --header "Authorization: Basic ${SR_API_KEY}" \
+curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions"   \
+  --user "${SR_API_KEY}:${SR_API_SECRET}" \
   --header 'content-type: application/octet-stream' \
   --data '{
             "schemaType": "AVRO",
@@ -77,8 +89,8 @@ curl --request POST --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions"   
 ## Register Rule
 
 ```shell
-curl --request POST --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions" \
-  --header "Authorization: Basic ${SR_API_KEY}" \
+curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions" \
+  --user "${SR_API_KEY}:${SR_API_SECRET}" \
   --header 'Content-Type: application/vnd.schemaregistry.v1+json' \
   --data '{
         "ruleSet": {
@@ -104,8 +116,8 @@ curl --request POST --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions" \
 We can check that everything is registered correctly by either executing
 ```shell
 curl --request GET \
-  --url "${REST_ENDPOINT}/subjects/${TOPIC}-value/versions/latest" \
-  --header "Authorization: Basic ${SR_API_KEY}" | jq
+  --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions/latest" \
+  --user "${SR_API_KEY}:${SR_API_SECRET}" | jq
 ```
 
 or in the CC UI

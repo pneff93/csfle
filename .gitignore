@@ -1,1 +1,2 @@
-*/Kafka*/build
+*/Kafka*/build/*
+!*/Kafka*/build/generated*/

@@ -52,6 +52,7 @@ We register the schema with setting `PII` to the birthday field and defining the
 
 ```shell
 
+export BOOTSTRAP_SERVERS="<YOUR_BOOTSTRAP_SERVERS>"
 export KAFKA_CLUSTER_REST_ENDPOINT="<YOUR-REST-ENDPOINT>"
 export KAFKA_CLUSTER_ID="<ID OF YOUR CLUSTER>"
 export API_KEY="<Your Cluster API Key>"
@@ -129,8 +130,8 @@ or in the CC UI
 ### Gradle
 We need to add
 ```shell
-implementation("io.confluent:kafka-avro-serializer:7.4.2")
-implementation("io.confluent:kafka-schema-registry-client-encryption-hcvault:7.4.2")
+implementation("io.confluent:kafka-avro-serializer:7.6.0")
+implementation("io.confluent:kafka-schema-registry-client-encryption-hcvault:7.6.0")
 ```
 
 ### Producer
@@ -144,14 +145,15 @@ settings.setProperty("use.latest.version", "true")
 settings.setProperty("auto.register.schemas","false")
 ```
 
-We continuously produce data with the encryption (the topic `pneff-csfle-test` needs to be created before) by executing
+Make sure all environment variables as mentioned above are defined. 
+Then we continuously produce data with the encryption (the topic `csfle-test` needs to be created before) by executing
 ```
 ./gradlew run
 ```
 
 We can see in the logs that everything is working fine
 ```shell
-[kafka-producer-network-thread | producer-2] INFO  KafkaProducer - event produced to pneff-csfle-test
+[kafka-producer-network-thread | producer-2] INFO  KafkaProducer - event produced to csfle-test
 ```
 
 or check the encrypted field messages in the CC UI
@@ -160,8 +162,7 @@ or check the encrypted field messages in the CC UI
 
 ## Consumer
 
-We configure the consumer with the corresponding configurations
-and just log the consumed event.
+Again, make sure that all environment variables as shown above are defined. 
 We can run it again with
 ```
 ./gradlew run

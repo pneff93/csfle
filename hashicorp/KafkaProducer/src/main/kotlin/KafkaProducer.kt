@@ -14,11 +14,13 @@ class KafkaProducer {
     private val logger = logger(javaClass.name)
     private val gson = Gson()
 
-    fun produceEvents(properties: ProducerProperties, data: List<String>): Thread {
+    fun produceEvents(properties: Properties, data: List<String>): Thread {
 
         val thread = Thread {
 
-            val kafkaProducer = KafkaProducer<String, PersonalData>(properties.configureProperties())
+            val topicName = properties.getProperty("topic.name")
+            properties.remove("topic.name")
+            val kafkaProducer = KafkaProducer<String, PersonalData>(properties)
 
             Thread.sleep(10000)
             logger.info("Kafka Producer started")
@@ -29,7 +31,7 @@ class KafkaProducer {
                 personalData.setTimestamp(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.'SSS'Z'").format(Date()))
 
                 try {
-                    kafkaProducer.send(ProducerRecord("pneff-csfle-test", personalData.getId(), personalData),
+                    kafkaProducer.send(ProducerRecord(topicName, personalData.getId(), personalData),
                     ) { m: RecordMetadata, e: Exception? ->
                         when (e) {
                             null -> logger.info("event produced to ${m.topic()}")

@@ -1,0 +1,16 @@
+security.protocol=SASL_SSL
+sasl.mechanism=PLAIN
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='<Username or API-KEY>' password='<Password or API-SECRET>';
+bootstrap.servers=<hostname>:<port>
+group.id=<Name of your consumer group>
+# Schema Registry
+schema.registry.url=<URL OF SCHEMA REGISTRY>
+basic.auth.credentials.source=USER_INFO
+basic.auth.user.info=<user>:<password>
+use.latest.version=true
+auto.register.schemas=false
+# Encryption
+rule.executors._default_.param.token.id=<root-token>
+# Topic configuration
+topic.name=csfle-test
+

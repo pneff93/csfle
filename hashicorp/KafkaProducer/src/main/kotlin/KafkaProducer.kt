@@ -29,7 +29,7 @@ class KafkaProducer {
                 personalData.setTimestamp(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.'SSS'Z'").format(Date()))
 
                 try {
-                    kafkaProducer.send(ProducerRecord("pneff-csfle-test", personalData.getId(), personalData),
+                    kafkaProducer.send(ProducerRecord("csfle-test", personalData.getId(), personalData),
                     ) { m: RecordMetadata, e: Exception? ->
                         when (e) {
                             null -> logger.info("event produced to ${m.topic()}")

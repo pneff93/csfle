@@ -11,7 +11,7 @@ class KafkaConsumer {
     fun consumeEvents(properties: ConsumerProperties) {
 
         val consumer = org.apache.kafka.clients.consumer.KafkaConsumer<String, PersonalData>(properties.configureProperties())
-        consumer.subscribe(listOf("pneff-csfle-test"))
+        consumer.subscribe(listOf("csfle-test"))
 
         while (true) {
 

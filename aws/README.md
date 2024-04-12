@@ -1,6 +1,6 @@
 # Client-Side Field Level Encryption (CSFLE) with AWS KMS
 
-This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](http://staging-docs-independent.confluent.io/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
+This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
 
 ## Prerequisites

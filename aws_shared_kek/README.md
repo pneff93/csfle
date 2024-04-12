@@ -1,6 +1,6 @@
 # Client-Side Field Level Encryption (CSFLE) with AWS KMS, KMS access shared with Confluent
 
-This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](http://staging-docs-independent.confluent.io/docs-cloud/PR/2843/current/clusters/csfle/overview.html).
+This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
 This example implements the CSFLE shared KEK flow, meaning that the DEK Registry has access to the KMS. In this scenario:
 * clients do not need KMS credentials to retrieve the master key and decrypt the DEKs, in fact the DEK Registry will make the decrypted DEK available to authorized clients

@@ -51,13 +51,13 @@ After your Key has been created, navigate to AWS IAM and create an Access Key fo
 :warning: **Important:** Ensure you copy your Access Key ID and Secret (or download the csv file) :warning:
 
 ## Register Schema
-
+[Create](https://docs.confluent.io/cloud/current/stream-governance/stream-catalog.html#create-tags) a tag called `PII` if not already existing.  
 We register the schema with setting `PII` to the birthday field and define the encryption rule
 
 ```shell
 curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/subjects/dgingera-csfle-demo-value/versions'   \
   --header 'Authorization: Basic <base64 encoded SR Key:Secret>' \ 
-  --header 'content-type: application/octet-stream' \
+  --header 'content-type: application/vnd.schemaregistry.v1+json' \
   --data '{
             "schemaType": "AVRO",
             "schema": "{  \"name\": \"PersonalData\", \"type\": \"record\", \"namespace\": \"com.csfleExample\", \"fields\": [{\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"name\", \"type\": \"string\"},{\"name\": \"birthday\", \"type\": \"string\", \"confluent:tags\": [ \"PII\"]},{\"name\": \"timestamp\",\"type\": [\"string\", \"null\"]}]}",

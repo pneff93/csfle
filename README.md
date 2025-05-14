@@ -10,7 +10,7 @@ It covers step-by-step guidelines for different KMS via folders:
 | [HashiCorp](hashicorp/README.md)               | HashiCorp Vault            | no             |
 | [AWS](aws/README.md)                           | AWS Key Management Service | no             |
 | [GCP](gcp/README.md)                           | GCP Key Management Service | no             |
-| [AWS - Shared](aws_shared_kek/README.md) | AWS Key Management Service | yes            |
+| [AWS - Shared](aws_shared_kek/README.md)       | AWS Key Management Service | yes            |
 
 ## Prerequisites
 

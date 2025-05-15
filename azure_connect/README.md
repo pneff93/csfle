@@ -136,6 +136,15 @@ kubectl -n confluent create secret generic mysql-credential \
   --from-file=sqlcreds.txt=./sqlcreds.txt
 ```
 
+Mount the driver
+```shell
+kubectl create secret generic mysql-driver \
+  --from-file=mysql-connector-j-9.3.0.jar \
+  -n confluent
+```
+
+
+
 Deploy the Connect Cluster
 
 ```shell
@@ -168,11 +177,11 @@ kubectl -n confluent apply -f ./jdbc-source-connector.yaml
 > Be aware to add the required configurations for CSLFE to the connector configuration as stated in the documentation.
 
 ```yaml
-csfle.enabled: true
-value.converter.auto.register.schemas: false
-value.converter.use.latest.version: true
-key.converter.auto.register.schemas: false
-key.converter.use.latest.version: true
+csfle.enabled: "true"
+value.converter.auto.register.schemas: "false"
+value.converter.use.latest.version: "true"
+key.converter.auto.register.schemas: "false"
+key.converter.use.latest.version: "true"
 
 rule.executors._default_.param.tenant.id: "<tenant ID>"
 rule.executors._default_.param.client.id: "<client ID>"
@@ -183,3 +192,4 @@ rule.executors._default_.param.client.secret: "<secret value>"
 kubectl -n confluent apply -f ./jdbc-source-connector.yaml 
 ```
 
+curl -X GET http://localhost:8083/connectors/jdbc-source/status

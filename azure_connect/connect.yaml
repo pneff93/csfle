@@ -17,8 +17,8 @@ spec:
         locationType: url
         url:
           - name: kafka-connect-jdbc # the url is used here as we needed to build our own connector lib to include the mysql jdbc jar
-            archivePath: https://raw.githubusercontent.com/pneff93/csfle/connect/azure_connect/confluentinc-kafka-connect-jdbc-10.8.4.zip
-            checksum: 37f383cd44e456c22d96ef23ae4bbac85e33bf73669cb5d8fcce0e87345c092e88f2be5cc97b03f64d301c1c5f96fecf18d9d0f6f2a5db4062816597fa9a0b0b
+            archivePath: https://raw.githubusercontent.com/pneff93/csfle/connect/azure_connect/confluentinc-kafka-connect-jdbc.zip
+            checksum: da8cabdc33f45395104aa84fe07381ef777f8b7b3322d03bb55c907af4091dde3f9ea1218bcd7b99985a1ff7aa04dfd31b2fb87da256ca88db51b7caa7d24fab
   dependencies:
     kafka:
       bootstrapEndpoint: pkc-5roon.us-east-1.aws.confluent.cloud:9092

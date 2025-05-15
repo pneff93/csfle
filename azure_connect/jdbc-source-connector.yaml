@@ -15,9 +15,9 @@ spec:
     incrementing.column.name: "id"
     topic.prefix: "pneff-csfle-connect"
     poll.interval.ms: "1000"
-    csfle.enabled: true
-    value.converter.auto.register.schemas: false
-    value.converter.use.latest.version: true
-    key.converter.auto.register.schemas: false
-    key.converter.use.latest.version: true
+    csfle.enabled: "true"
+    value.converter.auto.register.schemas: "false"
+    value.converter.use.latest.version: "true"
+    key.converter.auto.register.schemas: "false"
+    key.converter.use.latest.version: "true"
 

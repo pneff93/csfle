@@ -136,15 +136,6 @@ kubectl -n confluent create secret generic mysql-credential \
   --from-file=sqlcreds.txt=./sqlcreds.txt
 ```
 
-Mount the driver
-```shell
-kubectl create secret generic mysql-driver \
-  --from-file=mysql-connector-j-9.3.0.jar \
-  -n confluent
-```
-
-
-
 Deploy the Connect Cluster
 
 ```shell
@@ -161,7 +152,9 @@ curl -s -XGET http://localhost:8083/connector-plugins | jq '.[].class'
 ```
 
 > [!NOTE]
-> Be aware that when adding the jdbc connector, we need to use version at least 10.8.2 as stated in the documentation.
+> Be aware that when adding the jdbc connector, we need to use at least version 10.8.2 as stated in the documentation.
+> Also as stated [here](https://docs.confluent.io/kafka-connectors/jdbc/10.8/jdbc-drivers.html#mysql-server), we need to add
+> a JDBC driver for MySQL. Therefore, we download the driver and upload it together with the JDBC connector as a zip file. 
 
 ## Deploy the JDBC Source Connector
 

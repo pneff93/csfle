@@ -11,6 +11,7 @@ It covers step-by-step guidelines for different KMS via folders:
 | [AWS](aws/README.md)                           | AWS Key Management Service | no             |
 | [GCP](gcp/README.md)                           | GCP Key Management Service | no             |
 | [AWS - Shared](aws_shared_kek/README.md)       | AWS Key Management Service | yes            |
+| [Azure - SM Connect](azure_connect/README.md)  | Azure Key Vault            | no             |
 
 ## Prerequisites
 

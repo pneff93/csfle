@@ -29,7 +29,7 @@ Please follow the steps as explained in [../azure](../azure/README.md) until "Pr
 > [!NOTE]
 > Because we are using CFK on AKS, we also need to provide Key Vault permissions to the Service Principal of the AKS
 > 
-> The schema differs a bit compared to the example in azure.
+> The schema differs a bit compared to the example in Azure.
 > Please use the following adapted commands
 
 ### Register Schema
@@ -79,7 +79,7 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
 * Please follow [Quickstart: Deploy an Azure Kubernetes Service (AKS) cluster using Azure portal](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-portal?tabs=azure-cli)
 to set up AKS.
 * Then deploy the CFK operator as explained in [Confluent for Kubernetes Quick Start](https://docs.confluent.io/operator/current/co-quickstart.html).
-* Finally, crate the `confluent` namespace via
+* Finally, create the `confluent` namespace via
 
 ```shell
 kubectl create ns confluent
@@ -100,7 +100,7 @@ In a second terminal window, run a MySQL client to connect to the server:
 kubectl run -it --rm --image=mysql:5.6 --restart=Never mysql-client -- mysql -h mysql -ppassword
 ```
 
-Inside the shell you will create a database, a table, and entries:
+Inside the shell, you will create a database, a table, and entries:
 
 ```roomsql
 CREATE DATABASE IF NOT EXISTS connect;

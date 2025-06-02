@@ -27,7 +27,7 @@ However, we set up the corresponding configurations to encrypt the birthday fiel
 Please follow the steps as explained in [../azure](../azure/README.md) until "Producer Configuration".
 
 > [!NOTE]
-> Because we are using a CFK on AKS, we also need to provide Key Vault permissions to the Service Principal of the AKS
+> Because we are using CFK on AKS, we also need to provide Key Vault permissions to the Service Principal of the AKS
 > 
 > The schema differs a bit compared to the example in azure.
 > Please use the following adapted commands
@@ -100,7 +100,7 @@ In a second terminal window, run a MySQL client to connect to the server:
 kubectl run -it --rm --image=mysql:5.6 --restart=Never mysql-client -- mysql -h mysql -ppassword
 ```
 
-Inside the shell you will create a database, table and entries:
+Inside the shell you will create a database, a table, and entries:
 
 ```roomsql
 CREATE DATABASE IF NOT EXISTS connect;
@@ -130,7 +130,7 @@ You need to paste the key in the corresponding file first.
 kubectl -n confluent create secret generic ccloud-credentials --from-file=plain.txt=./ccloud-credentials.txt  
 kubectl -n confluent create secret generic ccloud-sr-credentials --from-file=basic.txt=./ccloud-sr-credentials.txt
 ```
-Create a k8s Secret for the JDBC connector to pull connection URL and password for the mysql server
+Create a k8s Secret for the JDBC connector to pull the connection URL and password for the MySQL server
 
 ```
 kubectl -n confluent create secret generic mysql-credential \
@@ -153,7 +153,7 @@ curl -s -XGET http://localhost:8083/connector-plugins | jq '.[].class'
 ```
 
 > [!NOTE]
-> Be aware that when adding the jdbc connector, we need to use at least version 10.8.2 as stated in the documentation.
+> Be aware that when adding the JDBC connector, we need to use at least version 10.8.2 as stated in the documentation.
 > Also as stated [here](https://docs.confluent.io/kafka-connectors/jdbc/10.8/jdbc-drivers.html#mysql-server), we need to add
 > a JDBC driver for MySQL. Therefore, we download the driver and upload it together with the JDBC connector as a zip file. 
 

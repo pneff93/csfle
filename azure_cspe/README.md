@@ -5,7 +5,6 @@ This repository provides a step-by-step demo of the Confluent Cloud feature [Cli
 ## Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
-* For clients, Confluent Platform 7.4.2 or 7.5.1 are required.
 
 ## Goal
 

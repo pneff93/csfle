@@ -9,8 +9,9 @@ This repository provides a step-by-step demo of the Confluent Cloud feature [Cli
 
 ## Goal
 
-We will produce personal data to Confluent Cloud in the following form 
-```
+We will produce personal data to Confluent Cloud in the following form
+
+```json
 {
     "id": "0",
     "name": "Anna",
@@ -18,6 +19,7 @@ We will produce personal data to Confluent Cloud in the following form
     "timestamp": "2023-10-07T19:54:21.884Z"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the `birthday` field.
 We then start a consumer with the corresponding configurations to decrypt the field again.
 
@@ -43,14 +45,14 @@ Copy the
 
 Create a Key Vault and a key. Copy the Key Identifier as displayed below
 
-![](AzureKey.png)
+![](../AzureKey.png)
 
 ### Azure Assign a Key Vault access policy
 
 In the Key Vault, we use Access policies to grant permission for the key to the registered application, see the [documentation](https://learn.microsoft.com/en-us/azure/key-vault/general/assign-access-policy?tabs=azure-portal).
 We provide "All Key Permissions" (in production we recommend following the principle of least privilege).
 
-![](AzureKeyAccess.png)
+![](../AzureKeyAccess.png)
 
 ## Register Schema
 
@@ -59,7 +61,8 @@ We register the schema with setting `PII` to the birthday field and defining the
 ```shell
 curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-csfle-test-value/versions'   \
   --header 'Authorization: Basic <SR API Key>:<SR API Secret>' \ <-- base64 encoded credentials
-  --header 'content-type: application/octet-stream' \
+  --header 'Accept: application/vnd.schemaregistry.v1+json' \
+  --header 'Content-Type: application/json' \
   --data '{
             "schemaType": "AVRO",
             "schema": "{  \"name\": \"PersonalData\", \"type\": \"record\", \"namespace\": \"com.csfleExample\", \"fields\": [{\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"name\", \"type\": \"string\"},{\"name\": \"birthday\", \"type\": \"string\", \"confluent:tags\": [ \"PII\"]},{\"name\": \"timestamp\",\"type\": [\"string\", \"null\"]}]}",
@@ -107,7 +110,7 @@ curl --request GET \
 
 or in the CC UI
 
-![](CCEncryptionRule.png)
+![](../CCEncryptionRule.png)
 
 ## Producer configuration
 

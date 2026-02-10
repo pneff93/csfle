@@ -5,7 +5,6 @@ This repository provides a step-by-step guideline of the Confluent Cloud feature
 > [!NOTE]
 > We will deploy the Connect Cluster and Connector using Confluent for Kubernetes (CFK) on an Azure Kubernetes Service (AKS).
 
-
 ## Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
@@ -13,13 +12,15 @@ This repository provides a step-by-step guideline of the Confluent Cloud feature
 ## Goal
 
 We will produce personal data to Confluent Cloud in the following form
-```
+
+```json
 {
     "id": "1",
     "name": "Anna",
     "birthday": "1993-08-01"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the birthday field.
 
 ## Set up Azure Key Vault and Confluent Cloud
@@ -28,7 +29,7 @@ Please follow the steps as explained in [../azure](../azure/README.md) until "Pr
 
 > [!NOTE]
 > Because we are using CFK on AKS, we also need to provide Key Vault permissions to the Service Principal of the AKS
-> 
+>
 > The schema differs a bit compared to the example in Azure.
 > Please use the following adapted commands
 
@@ -47,6 +48,7 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
           }
     }' 
 ```
+
 ### Register Rule
 
 ```shell
@@ -86,8 +88,8 @@ kubectl create ns confluent
 ```
 
 ## Set up MySQL service
-We are following the [Kubernetes documentation](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
 
+We are following the [Kubernetes documentation](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
 
 ```shell
 kubectl config set-context --current --namespace=confluent
@@ -96,13 +98,14 @@ kubectl apply -f https://k8s.io/examples/application/mysql/mysql-deployment.yaml
 ```
 
 In a second terminal window, run a MySQL client to connect to the server:
+
 ```shell
 kubectl run -it --rm --image=mysql:5.6 --restart=Never mysql-client -- mysql -h mysql -ppassword
 ```
 
 Inside the shell, you will create a database, a table, and entries:
 
-```roomsql
+```sql
 CREATE DATABASE IF NOT EXISTS connect;
 USE connect;
 
@@ -117,22 +120,24 @@ INSERT INTO person (name, birthday) VALUES ('Joe', '1996-09-11');
 ```
 
 Verify that the data is in the table:
-```roomsql
+
+```sql
 SELECT * from person;
 ```
 
 ## Set up the Connect Cluster
 
-Create k8s Secrets for the Confluent Cloud Cluster API Key and Confluent Cloud Schema Registry API Key. 
+Create k8s Secrets for the Confluent Cloud Cluster API Key and Confluent Cloud Schema Registry API Key.
 You need to paste the key in the corresponding file first.
 
-```
+```shell
 kubectl -n confluent create secret generic ccloud-credentials --from-file=plain.txt=./ccloud-credentials.txt  
 kubectl -n confluent create secret generic ccloud-sr-credentials --from-file=basic.txt=./ccloud-sr-credentials.txt
 ```
+
 Create a k8s Secret for the JDBC connector to pull the connection URL and password for the MySQL server
 
-```
+```shell
 kubectl -n confluent create secret generic mysql-credential \
   --from-file=sqlcreds.txt=./sqlcreds.txt
 ```
@@ -148,6 +153,7 @@ Verify that the plugin has been successfully installed via
 ```shell
 kubectl port-forward connect-0 8083
 ```
+
 ```shell
 curl -s -XGET http://localhost:8083/connector-plugins | jq '.[].class'
 ```
@@ -155,14 +161,15 @@ curl -s -XGET http://localhost:8083/connector-plugins | jq '.[].class'
 > [!NOTE]
 > Be aware that when adding the JDBC connector, we need to use at least version 10.8.2 as stated in the documentation.
 > Also as stated [here](https://docs.confluent.io/kafka-connectors/jdbc/10.8/jdbc-drivers.html#mysql-server), we need to add
-> a JDBC driver for MySQL. Therefore, we download the driver and upload it together with the JDBC connector as a zip file. 
+> a JDBC driver for MySQL. Therefore, we download the driver and upload it together with the JDBC connector as a zip file.
 
 ## Deploy the JDBC Source Connector
 
-Before deploying the actual connector, we need to create the corresponding Kafka topic `pneff-csfle-connect-person`. 
+Before deploying the actual connector, we need to create the corresponding Kafka topic `pneff-csfle-connect-person`.
 This is a combination of the prefix (configured in the connector configuration) and the database table name.
 
 Deploy the connector:
+
 ```shell
 kubectl -n confluent apply -f ./jdbc-source-connector.yaml 
 ```
@@ -196,20 +203,23 @@ rule.executors._default_.param.client.secret: "<secret value>"
 ```
 
 ## Verify
+
 Check if the connector is up and running via
+
 ```shell
 kubectl port-forward connect-0 8083
 ```
+
 ```shell
 curl -X GET http://localhost:8083/connectors/jdbc-source/status
 ```
 
 In the MySQL client terminal, add another entry
-```roomsql
+
+```sql
 INSERT INTO person (name, birthday) VALUES ('Patrick', '1993-08-26');
 ```
 
 In CC, we see the encrypted field
 
 ![](CC_encrypted.png)
-

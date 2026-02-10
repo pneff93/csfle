@@ -6,8 +6,8 @@ feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/cur
 ## Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
-* For the support python client versions see the
-  requirements [here](https://docs.confluent.io/cloud/current/security/encrypt/csfle/client-side.html#confluent-python-client-for-ak)
+* For the support python client versions see [the
+  requirements](https://docs.confluent.io/cloud/current/security/encrypt/csfle/client-side.html#confluent-python-client-for-ak)
 
 ## Goal
 
@@ -61,7 +61,7 @@ Copy the
 
 Create a Key Vault and a key. Copy the Key Identifier as displayed below
 
-![](../AzureKey.png)
+![](../images/AzureKey.png)
 
 ### Assign a Key Vault access policy in Azure
 
@@ -69,7 +69,7 @@ In the Key Vault, we use Access policies to grant permission for the key to the 
 the [documentation](https://learn.microsoft.com/en-us/azure/key-vault/general/assign-access-policy?tabs=azure-portal).
 We provide "All Key Permissions" (in production we recommend following the principle of least privilege).
 
-![](../AzureKeyAccess.png)
+![](../images/AzureKeyAccess.png)
 
 ## Register the tag
 
@@ -136,7 +136,7 @@ curl --request GET \
 
 or in the CC UI (the name of schema subject would be csfle-demo)
 
-![](../CCEncryptionRule.png)
+![](../images/CCEncryptionRule.png)
 
 ## Client configuration
 
@@ -161,7 +161,7 @@ Update the corresponding global variables in each client.
 
 Run the producer
 
-```aiignore python
+```aiignore shell
 python avro_producer.py
 ```
 
@@ -173,7 +173,7 @@ PersonalData record b'2' successfully produced to csfle-demo [1] at offset 0
 
 Now you can consume the data
 
-```pycon
+```shell
 python avro_consumer.py
 ```
 

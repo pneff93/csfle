@@ -37,6 +37,7 @@ As of today, we need to create the tag in the Stream Catalog first, see the [doc
 
 In Azure AD (Entra ID), we create an app with a secret, see this [Quickstart documentation](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app).
 Copy the
+
 * tenant ID
 * client ID
 * secret value (you need to copy it directly after creation)
@@ -45,14 +46,14 @@ Copy the
 
 Create a Key Vault and a key. Copy the Key Identifier as displayed below
 
-![](../AzureKey.png)
+![](../images/AzureKey.png)
 
 ### Azure Assign a Key Vault access policy
 
 In the Key Vault, we use Access policies to grant permission for the key to the registered application, see the [documentation](https://learn.microsoft.com/en-us/azure/key-vault/general/assign-access-policy?tabs=azure-portal).
 We provide "All Key Permissions" (in production we recommend following the principle of least privilege).
 
-![](../AzureKeyAccess.png)
+![](../images/AzureKeyAccess.png)
 
 ## Register Schema
 
@@ -74,6 +75,7 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
           }
     }' 
 ```
+
 ## Register Rule
 
 ```shell
@@ -102,6 +104,7 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
 ```
 
 We can check that everything is registered correctly by either executing
+
 ```shell
 curl --request GET \
   --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-csfle-test-value/versions/latest'   \
@@ -110,19 +113,23 @@ curl --request GET \
 
 or in the CC UI
 
-![](../CCEncryptionRule.png)
+![](../images/CCEncryptionRule.png)
 
 ## Producer configuration
 
 ### Gradle
+
 We need to add
+
 ```shell
 implementation("io.confluent:kafka-avro-serializer:7.4.2")
 implementation("io.confluent:kafka-schema-registry-client-encryption-azure:7.4.2")
 ```
 
 ### Producer
+
 We need to adjust the configuration by adding
+
 ```kotlin
 // Encryption
 settings.setProperty("rule.executors._default_.param.tenant.id", "<tenant ID>")
@@ -135,11 +142,13 @@ settings.setProperty("auto.register.schemas","false")
 ```
 
 We continuously produce data with the encryption (the topic `pneff-csfle-test` needs to be created before) by executing
-```
+
+```shell
 ./gradlew run
 ```
 
 We can see in the logs that everything is working fine
+
 ```shell
 [ForkJoinPool.commonPool-worker-1] INFO  com.microsoft.aad.msal4j.AcquireTokenSilentSupplier - Returning token from cache
 [ForkJoinPool.commonPool-worker-1] INFO  com.azure.identity.ClientSecretCredential - Azure Identity => getToken() result for scopes [https://vault.azure.net/.default]: SUCCESS
@@ -149,14 +158,15 @@ We can see in the logs that everything is working fine
 
 or check the encrypted field messages in the CC UI
 
-![](CCEvents.png)
+![](../images/CCEvents.png)
 
 ## Consumer
 
 We configure the consumer with the corresponding configurations
 and just log the consumed event.
 We can run it again with
-```
+
+```shell
 ./gradlew run
 ```
 

@@ -179,7 +179,7 @@ curl --request GET \
 
 You can also verify in the Confluent Cloud UI:
 
-![](../CCEncryptionRule.png)
+![](../images/CCEncryptionRule.png)
 
 ## 🚀 Running the Demo
 

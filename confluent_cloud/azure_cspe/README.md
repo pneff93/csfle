@@ -8,8 +8,9 @@ This repository provides a step-by-step demo of the Confluent Cloud feature [Cli
 
 ## Goal
 
-We will produce personal data to Confluent Cloud in the following form 
-```
+We will produce personal data to Confluent Cloud in the following form
+
+```json
 {
     "id": "0",
     "name": "Anna",
@@ -17,6 +18,7 @@ We will produce personal data to Confluent Cloud in the following form
     "timestamp": "2023-10-07T19:54:21.884Z"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the entire payload.
 We then start a consumer with the corresponding configurations to decrypt the payload again.
 
@@ -29,6 +31,7 @@ producer and consumer application with Kotlin.
 
 In Azure AD (Entra ID), we create an app with a secret, see this [Quickstart documentation](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app).
 Copy the
+
 * tenant ID
 * client ID
 * secret value (you need to copy it directly after creation)
@@ -65,6 +68,7 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
           }
     }' 
 ```
+
 ## Register Rule
 
 Be aware, that for CSPE you need to configure `encodingRules`.
@@ -94,6 +98,7 @@ curl --request POST --url 'https://psrc-abc.westeurope.azure.confluent.cloud/sub
 ```
 
 We can check that everything is registered correctly by either executing
+
 ```shell
 curl --request GET \
   --url 'https://psrc-abc.westeurope.azure.confluent.cloud/subjects/pneff-cspe-test-value/versions/latest'   \
@@ -103,14 +108,18 @@ curl --request GET \
 ## Producer configuration
 
 ### Gradle
+
 We need to add
+
 ```shell
 implementation("io.confluent:kafka-avro-serializer:8.1.0")
 implementation("io.confluent:kafka-schema-registry-client-encryption-azure:8.1.0")
 ```
 
 ### Producer
+
 We need to adjust the configuration by adding
+
 ```kotlin
 // Encryption
 settings.setProperty("rule.executors._default_.param.tenant.id", "<tenant ID>")
@@ -123,11 +132,13 @@ settings.setProperty("auto.register.schemas","false")
 ```
 
 We continuously produce data with the encryption (the topic `pneff-cspe-test` needs to be created before) by executing
-```
+
+```shell
 ./gradlew run
 ```
 
 We can see in the logs that everything is working fine
+
 ```shell
 [ForkJoinPool.commonPool-worker-1] INFO  com.microsoft.aad.msal4j.AcquireTokenSilentSupplier - Returning token from cache
 [ForkJoinPool.commonPool-worker-1] INFO  com.azure.identity.ClientSecretCredential - Azure Identity => getToken() result for scopes [https://vault.azure.net/.default]: SUCCESS
@@ -140,7 +151,8 @@ We can see in the logs that everything is working fine
 We configure the consumer with the corresponding configurations
 and just log the consumed event.
 We can run it again with
-```
+
+```shell
 ./gradlew run
 ```
 

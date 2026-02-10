@@ -3,8 +3,9 @@
 This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
 This example implements the CSFLE shared KEK flow, meaning that the DEK Registry has access to the KMS. In this scenario:
+
 * clients do not need KMS credentials to retrieve the master key and decrypt the DEKs, in fact the DEK Registry will make the decrypted DEK available to authorized clients
-* Confluent components such as ksqlDB and Flink will be able to decrypt the fields and enable further use cases. Please note that ksqlDB, Flink support for CSFLE is not available at the moment 
+* Confluent components such as ksqlDB and Flink will be able to decrypt the fields and enable further use cases. Please note that ksqlDB, Flink support for CSFLE is not available at the moment
 
 ## Prerequisites
 
@@ -13,8 +14,9 @@ This example implements the CSFLE shared KEK flow, meaning that the DEK Registry
 
 ## Goal
 
-We will produce personal data to Confluent Cloud in the following form 
-```
+We will produce personal data to Confluent Cloud in the following form
+
+```json
 {
     "id": "0",
     "name": "Anna",
@@ -22,6 +24,7 @@ We will produce personal data to Confluent Cloud in the following form
     "timestamp": "2023-10-07T19:54:21.884Z"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the `birthday` field.
 We then start a consumer with the corresponding configurations to decrypt the field again.
 
@@ -39,11 +42,11 @@ In the KMS section of the AWS Management Console, create a new Symmetric Key wit
 ![](images/aws_iam_access_key.png)
 
 ### Optional - KMS User (ServiceAccount) registration
-As you click through this process you will be asked to define `Admins` and `Users` for your key. 
+
+As you click through this process you will be asked to define `Admins` and `Users` for your key.
 There is no need to grant access to a user `User` (ServiceAccount) in order to try the shared KMS flow as clients do not need to interact with the KMS.
 
 However, if you want to test as well [KMS access toggling feature](#toggling-master-key-sharing), please grant access to a User and then navigate to AWS IAM by creating an Access Key for the same User.
-
 
 ![](images/aws_key_users.png)
 
@@ -52,7 +55,6 @@ However, if you want to test as well [KMS access toggling feature](#toggling-mas
 ## Retrieving AWS KMS key ARN
 
 Finally go to AWS KMS section again and copy the ARN of the key you previously created. We need this ARN to register our encryption rule below
-
 
 ![](images/aws_key_arn.png)
 
@@ -104,6 +106,7 @@ curl --request POST \
           }
     }'
 ```
+
 ## Registering KEK
 
 We register a KEK so that it can be referenced by encryption rules
@@ -116,15 +119,13 @@ curl --request POST \
   --header 'Content-Type: application/vnd.schemaregistry.v1+json' \
   --data "{
     \"name\": \"${AWS_KEK_NAME}\",
-	  \"kmsType\": \"aws-kms\",
-	  \"kmsKeyId\": \"${AWK_KMS_KEY_ID}\",
-	  \"shared\": true	
+   \"kmsType\": \"aws-kms\",
+   \"kmsKeyId\": \"${AWK_KMS_KEY_ID}\",
+   \"shared\": true 
 }"
 ```
 
-
 ## Register Encryption Rules
-
 
 Then, run the following curl to register the rule in Schema Registry. Alternatively, you can do this through the CC UI `Encryption Rules` section.
 
@@ -153,6 +154,7 @@ curl --request POST \
 ```
 
 We can check that everything is registered correctly by either executing
+
 ```shell
 curl  --url "${SR_URL}/subjects/csfle-kek-shared-demo-value/versions/latest"   --header "Authorization: Basic ${SR_BASE64_CRED}"  | jq
 ```
@@ -186,10 +188,10 @@ Go back in the KMS key policy configuration on AWS.  Press on "Switch to policy 
 
 ![](images/aws_register_confluent_permission_statements.png)
 
-
 ## Run the Producer
 
 We continuously produce data with the encryption (the topic `csfle-kek-shared-demo` needs to be created before) by executing
+
 ```
 ./gradlew run
 ```
@@ -208,7 +210,7 @@ or check the encrypted field messages in the CC UI
 
 ## Run the Consumer (Gradle)
 
-```
+```shell
 ./gradlew run
 ```
 
@@ -245,6 +247,7 @@ curl --request PUT \
 --data '{ "shared": false}'
 
 ```
+
 Trying to consume with KEK sharing disabled
 
 ```shell
@@ -260,7 +263,6 @@ We can see in the logs that birthday is encrypted
 
 If you want to decrypt keys when the KMS sharing is disabled, please make sure KMS credentials available to the client.
 
-
 ```shell
 export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
 export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
@@ -271,7 +273,7 @@ kafka-avro-console-consumer --topic ${TARGET_TOPIC}  --bootstrap-server   ${CC_B
 {"id":"4","name":"Laura","birthday":"1995-04-08","timestamp":{"string":"2023-11-28T17:24:51.179Z"}}
 ```
 
-Sharing again the Master key with Confluent 
+Sharing again the Master key with Confluent
 
 ```shell
 curl --request PUT \
@@ -283,6 +285,7 @@ curl --request PUT \
 ```
 
 Unset KMS credentials which are no longer needed as the client will receive the decrypted DEK directly from the Registry
+
 ```shell
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
@@ -292,4 +295,3 @@ kafka-avro-console-consumer --topic ${TARGET_TOPIC}  --bootstrap-server   ${CC_B
 {"id":"2","name":"Peter","birthday":"1993-02-22","timestamp":{"string":"2023-11-28T17:36:19.981Z"}}
 ..
 ```
-

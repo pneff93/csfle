@@ -283,9 +283,3 @@ docker compose down -v
 ```
 
 The `-v` flag removes volumes, which will delete all topic data and Schema Registry data.
-
-## 📚 Additional Resources
-
-* [Confluent CSFLE Documentation](https://docs.confluent.io/platform/current/schema-registry/fundamentals/data-encryption.html)
-* [AWS KMS Documentation](https://docs.aws.amazon.com/kms/)
-* [Parent README](../README.md) for more examples and AWS KMS setup details

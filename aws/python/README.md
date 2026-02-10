@@ -1,17 +1,17 @@
-# Client-Side Field Level Encryption (CSFLE) with AWS KMS
+# 🔐 Client-Side Field Level Encryption (CSFLE) with AWS KMS
 
 This repository provides a step-by-step demo of the Confluent Cloud
 feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html).
 
-## Prerequisites
+## 📋 Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
-* For the support python client versions see the
-  requirements [here](https://docs.confluent.io/cloud/current/security/encrypt/csfle/client-side.html#confluent-python-client-for-ak)
+* Python client versions -
+  see [requirements](https://docs.confluent.io/cloud/current/security/encrypt/csfle/client-side.html#confluent-python-client-for-ak)
 
-## Goal
+## 🎯 Goal
 
-We will produce personal data to Confluent Cloud in the following form
+We will produce personal data to Confluent Cloud in the following format:
 
 ```json
 {
@@ -22,74 +22,125 @@ We will produce personal data to Confluent Cloud in the following form
 }
 ```
 
-However, we set up the corresponding configurations to encrypt the `birthday` field.
-We then start a consumer with the corresponding configurations to decrypt the field again.
+The `birthday` field will be encrypted using CSFLE. We'll then consume the data with proper credentials to decrypt it,
+and simulate unauthorized access to demonstrate the security benefits.
 
-To have a realistic scenario, we do not produce and consume via the CLI but develop a
-producer and consumer application with Python.
+To create a realistic scenario, we'll develop producer and consumer applications in Python rather than using the CLI.
 
-## Environment
+## 🛠️ Setup
 
-```aiignore shell
+### 1. Python Environment
+
+Create a virtual environment and install dependencies:
+
+```shell
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## AWS
+### 2. AWS KMS Configuration
 
-In the KMS section of the AWS Management Console, create a new Symmetric Key with Encrypt/Decrypt configuration
+#### Create Symmetric Key
+
+In the AWS Management Console, navigate to KMS and create a new **Symmetric Key** with **Encrypt/Decrypt**
+configuration:
 
 ![](../images/aws_create_key.jpg)
 
 ![](../images/aws_key_config.jpg)
 
-As you click through this process you will be asked to define `Admins` and `Users` for your key. Ensure you grant access
-to the `User` that you want use in your Producer/Consumer app.
+During the creation process, define **Admins** and **Users** for your key. Ensure you grant access to the User that will
+run your Producer/Consumer applications.
 
 ![](../images/aws_key_users.jpg)
 
-### AWS IAM
+#### Create Access Key
 
-After your Key has been created, navigate to AWS IAM and create an Access Key for the User that you granted permissions
-to in the previous step.
+After your KMS key is created, navigate to **AWS IAM** and create an **Access Key** for the User you granted permissions
+to:
 
 ![](../images/aws_create_access_key.jpg)
 
-:warning: **Important:** Ensure you copy your Access Key ID and Secret (or download the csv file) :warning:
+> ⚠️ **Important:** Copy your Access Key ID and Secret Access Key now (or download the CSV file). You won't be able to
+> retrieve the secret later!
 
-## Register the tag
+### 3. Environment Variables
 
-We first need to create a tag on which we apply the encryption later, such as `PII`.
-As of today, we need to create the tag in the Stream Catalog first, see
-the [documentation](https://docs.confluent.io/platform/current/schema-registry/fundamentals/data-contracts.html#tags) of
-Data Contracts.
-
-Go to Confluent Cloud UI. From there select your environment and navigate to Catalog Management from the left side menu.
-`Home > Environments > [Your-Environment] > Stream Governance > Catalog management > Tags > Create Tags > PII`
-
-## Register Schema
-
-We register the schema with setting `PII` to the birthday field and defining the encryption rule
+Copy the example environment file and configure it with your credentials:
 
 ```shell
-curl --location '<BOOTSTRAP_SERVERS_URL>/subjects/csfle-demo-value/versions' \
+cp .env.example .env
+```
+
+Edit `.env` with your configuration values:
+
+| Configuration                      | Environment Variable                   |
+|------------------------------------|----------------------------------------|
+| **Kafka Broker URL**               | `KAFKA_BOOTSTRAP_SERVERS`              |
+| **Kafka API Key**                  | `KAFKA_SASL_USERNAME`                  |
+| **Kafka API Secret**               | `KAFKA_SASL_PASSWORD`                  |
+| **Schema Registry URL**            | `SCHEMA_REGISTRY_URL`                  |
+| **Schema Registry API Key:Secret** | `SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO` |
+| **AWS KMS Key ARN**                | `AWS_KMS_KEY_ID`                       |
+| **AWS KMS Key Name**               | `AWS_KMS_KEY_NAME`                     |
+| **AWS Access Key ID**              | `AWS_ACCESS_KEY_ID`                    |
+| **AWS Secret Access Key**          | `AWS_SECRET_ACCESS_KEY`                |
+
+> ⚠️ **Security:** Never commit the `.env` file to version control as it contains sensitive credentials!
+
+## 🏷️ Schema Configuration
+
+### Create the PII Tag
+
+First, create a tag in Confluent Cloud that we'll use to mark fields for encryption (e.g., `PII`).
+
+Navigate to:
+`Home > Environments > [Your-Environment] > Stream Governance > Catalog management > Tags > Create Tags > PII`
+
+See
+the [Data Contracts documentation](https://docs.confluent.io/platform/current/schema-registry/fundamentals/data-contracts.html#tags)
+for more details.
+
+### Load Environment Variables
+
+Before running the schema registration commands, load your configuration:
+
+```shell
+# Load environment variables from .env file
+set -a
+source .env
+set +a
+```
+
+> 💡 **Tip:** The `set -a` and `set +a` commands enable/disable automatic export of variables. You only need to source
+> the environment once per shell session. **Note:** Exported variables only affect the current terminal session and don't
+> persist across different terminals.
+
+### Register the Schema
+
+Register the Avro schema with the `PII` tag applied to the `birthday` field:
+
+```shell
+curl --location "$SCHEMA_REGISTRY_URL/subjects/$KAFKA_TOPIC-value/versions" \
 --header 'Accept: application/vnd.schemaregistry.v1+json' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Basic <base64 encoded SR_KEY:SR_SECRET>' \
+--header "Authorization: Basic $(echo -n $SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO | base64)" \
 --data '{
     "schemaType": "AVRO",
     "schema": "{  \"name\": \"PersonalData\", \"type\": \"record\", \"namespace\": \"com.csfleExample\", \"fields\": [{\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"name\", \"type\": \"string\"},{\"name\": \"birthday\", \"type\": \"string\", \"confluent:tags\": [ \"PII\"]},{\"name\": \"timestamp\",\"type\": [\"string\", \"null\"]}]}"
 }'
 ```
 
-## Register Rule
+### Register the Encryption Rule
+
+Define the encryption rule for all fields tagged with `PII`:
 
 ```shell
-curl --location 'BOOTSTRAP_SERVERS_URL/subjects/csfle-demo-value/versions' \
+curl --location "$SCHEMA_REGISTRY_URL/subjects/$KAFKA_TOPIC-value/versions" \
 --header 'Accept: application/vnd.schemaregistry.v1+json' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Basic <base64 encoded SR_KEY:SR_SECRET>' \
+--header "Authorization: Basic $(echo -n $SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO | base64)" \
 --data '{
     "ruleSet": {
         "domainRules": [
@@ -102,9 +153,9 @@ curl --location 'BOOTSTRAP_SERVERS_URL/subjects/csfle-demo-value/versions' \
                     "PII"
                 ],
                 "params": {
-                    "encrypt.kek.name": "<AWS KMS Key name>",
-                    "encrypt.kms.key.id": "<AWS KMS Key ARN>",
-                    "encrypt.kms.type": "aws-kms"
+                    "encrypt.kek.name": "'"$AWS_KMS_KEY_NAME"'",
+                    "encrypt.kms.key.id": "'"$AWS_KMS_KEY_ID"'",
+                    "encrypt.kms.type": "'"$AWS_KMS_TYPE"'"
                 },
                 "onFailure": "ERROR,NONE"
             }
@@ -113,56 +164,48 @@ curl --location 'BOOTSTRAP_SERVERS_URL/subjects/csfle-demo-value/versions' \
 }'
 ```
 
-We can check that everything is registered correctly by either executing
+> 💡 **Tip:** The pattern `"'"$VARIABLE"'"` is necessary to interpolate shell variables inside JSON strings. It works by
+> ending the single-quoted JSON string, adding a double-quoted variable, then starting the single-quoted string again.
+
+### Verify Configuration
+
+Check that everything is registered correctly:
 
 ```shell
 curl --request GET \
-  --url '<SR_URL>/subjects/csfle-demo-value/versions/latest'   \
-  --header 'Authorization: Basic <base64 encoded SR_API_KEY>:<SR_API_SECRET>' | jq
+  --url "$SCHEMA_REGISTRY_URL/subjects/$KAFKA_TOPIC-value/versions/latest" \
+  --header "Authorization: Basic $(echo -n $SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO | base64)" | jq
 ```
 
-or in the CC UI (the name of schema subject would be csfle-demo)
+You can also verify in the Confluent Cloud UI:
 
 ![](../CCEncryptionRule.png)
 
-## Client configuration
+## 🚀 Running the Demo
 
-We need to adjust the [producer](avro_producer.py)'s and [consumer](avro_consumer.py)'s configuration.
+### Produce Encrypted Data
 
-You need to have the following information
+Run the producer to send data with the encrypted `birthday` field:
 
-* Broker URL
-* Kafka API Key
-* Kafka API Secret
-* Schema Registry URL
-* Schema Registry API Key
-* Schema Registry API Secret
-* ARN of the key you created in AWS
-* AWS Credentials: Access Key ID & Secret Access Key
-
-Update the corresponding variables in each client.
-
-## Execute
-
-Run the producer
-
-```aiignore python
+```shell
 python avro_producer.py
 ```
 
-In the logs you should see
+✅ Expected output:
 
 ```log
-PersonalData record b'2' successfully produced to csfle-demo [1] at offset 0
+PersonalData record b'2' successfully produced to <YOUR TOPIC NAME> [1] at offset 0
 ```
 
-Now you can consume the data
+### Consume with Valid Credentials
 
-```pycon
+Run the consumer with valid AWS credentials to see decrypted data:
+
+```shell
 python avro_consumer.py
 ```
 
-In the logs you can see
+✅ Expected output (decrypted birthday):
 
 ```log
 --- Personal Data ---
@@ -173,10 +216,22 @@ In the logs you can see
 ---------------------
 ```
 
-You can simulate a scenario where a client without access to the KEK consumes the sensitive data.
-Change the Client Secret string, e.g. add a character at the end, so that authentication fails.
+### 🔒 Testing Unauthorized Access
 
-You will see some errors in the logs, but you will also see the following
+Simulate a scenario where a client **without access to the KEK** tries to consume the encrypted data by temporarily
+setting invalid AWS credentials:
+
+```shell
+# Temporarily override AWS credentials with invalid values
+export AWS_SECRET_ACCESS_KEY="invalid_secret_key"
+# Change the consumer group ID to re-consume all the messages from the topic
+export KAFKA_GROUP_ID="testing-invalid-key"
+
+# Run the consumer - it will fail to decrypt the birthday field
+python avro_consumer.py
+```
+
+🔴 Expected output (encrypted birthday remains encrypted):
 
 ```log
 --- Personal Data ---
@@ -187,4 +242,18 @@ You will see some errors in the logs, but you will also see the following
 ---------------------
 ```
 
-Consumers without access to the KEK are not able to read the fields that you have encrypted with CSFLE.
+✨ **This demonstrates that consumers without access to the KEK cannot decrypt fields protected by CSFLE**
+
+### Restore Valid Credentials
+
+To restore your correct AWS credentials for subsequent operations:
+
+```shell
+# Re-load environment variables from .env to restore correct credentials
+set -a
+source .env
+set +a
+```
+
+> 💡 **Remember:** Exported variables only affect the current terminal session. If you open a new terminal, you'll need
+> to source `.env` again.

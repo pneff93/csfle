@@ -7,6 +7,8 @@ from confluent_kafka.schema_registry.rules.encryption.awskms.aws_driver import A
 from confluent_kafka.schema_registry.rules.encryption.encrypt_executor import FieldEncryptionExecutor
 from confluent_kafka.serialization import MessageField, SerializationContext
 
+import config
+
 
 class PersonalData(object):
 
@@ -62,31 +64,12 @@ def main():
     consumer.close()
 
 
-# Topic
-topic = 'csfle-demo'
+# Load configuration from environment variables
+config.validate_config()
 
-# 👇 SR URL and <SR API Key:SR API Secret>
-schema_registry_conf = {
-    'url': '<SR_URL>',
-    'basic.auth.user.info': '<SR_API_KEY>:<SR_API_SECRET>'
-}
-
-# 👇 Bootstrap URL, Kafka API Key, Kafka API Secret
-consumer_conf = {
-    'bootstrap.servers': '<BOOTSTRAP_SERVERS_URL>',
-    'security.protocol': 'SASL_SSL',
-    'sasl.mechanism': 'PLAIN',
-    'sasl.username': '<KAFKA_API_KEY>',
-    'sasl.password': '<KAFKA_API_SECRET>',
-    'auto.offset.reset': "earliest",
-    'group.id': 'csfle-demo-consumer-group',
-}
-
-# 👇 Tenant ID of the registered app
-os.environ['ACCESS_KEY_ID'] = '<AWS_ACCESS_KEY_ID>'
-
-# 👇 Client ID of the registered app
-os.environ['SECRET_ACCESS_KEY'] = '<AWS_SECRET_ACCESS_KEY>'
+topic = config.get_topic()
+schema_registry_conf = config.get_schema_registry_config()
+consumer_conf = config.get_consumer_config()
 
 if __name__ == '__main__':
     main()

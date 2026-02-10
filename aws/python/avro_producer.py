@@ -1,14 +1,15 @@
 import os
 from datetime import datetime, timezone, date
-from uuid import uuid4
 
 from confluent_kafka import Producer
-from confluent_kafka.schema_registry import Rule, RuleKind, RuleMode, RuleParams, RuleSet, Schema, SchemaRegistryClient
+from confluent_kafka.schema_registry import Schema, SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.schema_registry.rules.encryption.awskms.aws_driver import AwsKmsDriver
 from confluent_kafka.schema_registry.rules.encryption.encrypt_executor import FieldEncryptionExecutor
 from confluent_kafka.serialization import MessageField, SerializationContext, StringSerializer
 from dateutil.relativedelta import relativedelta
+
+import config
 
 
 class PersonalData(object):
@@ -51,8 +52,8 @@ def main():
 
     schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 
-    subject = f"{topic}-value"
-    schema_registry_client.register_schema(subject, Schema(schema_str, "AVRO", [], None))
+    # subject = f"{topic}-value"
+    # schema_registry_client.register_schema(subject, Schema(schema_str, "AVRO", [], None))
 
     ser_conf = {'auto.register.schemas': False, 'use.latest.version': True}
     avro_serializer = AvroSerializer(schema_registry_client, schema_str, personal_data_to_dict, conf=ser_conf)
@@ -90,36 +91,13 @@ def main():
     producer.flush()
 
 
-# define the topic
-topic = 'csfle-demo'
+# Load configuration from environment variables
+config.validate_config()
 
-# name the KEK
-kek_name = '<AWS KMS Key Name>'
-kms_type = 'aws-kms'
-
-# 👇 that's the AWS ARN Identifier of the key you created in AWS KMS
-kms_key_id = '<AWS KMS Key ARN>'
-
-# 👇 SR URL and <SR API Key:SR API Secret>
-schema_registry_conf = {
-    'url': '<SR_URL>',
-    'basic.auth.user.info': '<SR_API_KEY>:<SR_API_SECRET>'
-}
-
-# 👇 Bootstrap URL, Kafka API Key, Kafka API Secret
-producer_conf = {
-    'bootstrap.servers': '<BOOTSTRAP_SERVERS_URL>',
-    'security.protocol': 'SASL_SSL',
-    'sasl.mechanism': 'PLAIN',
-    'sasl.username': '<KAFKA_API_KEY>',
-    'sasl.password': '<KAFKA_API_SECRET>',
-}
-
-# 👇 Tenant ID of the registered app
-os.environ['ACCESS_KEY_ID'] = '<AWS_ACCESS_KEY_ID>'
-
-# 👇 Client ID of the registered app
-os.environ['SECRET_ACCESS_KEY'] = '<AWS_SECRET_ACCESS_KEY>'
+topic = config.get_topic()
+schema_registry_conf = config.get_schema_registry_config()
+producer_conf = config.get_producer_config()
+kek_name, kms_type, kms_key_id = config.get_kms_config()
 
 if __name__ == '__main__':
     main()

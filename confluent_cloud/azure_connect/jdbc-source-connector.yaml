@@ -1,0 +1,40 @@
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: jdbc-source
+  namespace: confluent
+spec:
+  class: "io.confluent.connect.jdbc.JdbcSourceConnector"
+  taskMax: 1
+  connectClusterRef:
+    name: connect
+  configs:
+    connection.url: ${file:/mnt/secrets/mysql-credential/sqlcreds.txt:connection}
+    mode: "incrementing"
+    incrementing.column.name: "id"
+    topic.prefix: "pneff-csfle-connect-"
+    poll.interval.ms: "1000"
+
+    # required to explicitly set the SR configurations in the connector (we validated it)
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "<SR URL>"
+    value.converter.basic.auth.user.info: "<KEY>:<SECRET>"
+    value.converter.basic.auth.credentials.source: "USER_INFO"
+    value.converter.auto.register.schemas: "false"
+    value.converter.use.latest.version: "true"
+    value.converter.latest.cache.ttl.sec: "1"
+
+    # required to explicitly set the SR configurations in the connector (we validated it)
+    key.converter: "io.confluent.connect.avro.AvroConverter"
+    key.converter.schema.registry.url: "<SR URL>"
+    key.converter.basic.auth.user.info: "<KEY>:<SECRET>"
+    key.converter.basic.auth.credentials.source: "USER_INFO"
+    key.converter.auto.register.schemas: "false"
+    key.converter.use.latest.version: "true"
+
+    # CSFLE, see https://docs.confluent.io/platform/current/connect/manage-csfle.html#enable-csfle-for-connectors
+    csfle.enabled: "true"
+    rule.executors._default_.param.tenant.id: "<tenant ID>"
+    rule.executors._default_.param.client.id: "<client ID>"
+    rule.executors._default_.param.client.secret: "<secret value>"

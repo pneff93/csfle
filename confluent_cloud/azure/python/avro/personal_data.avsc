@@ -1,0 +1,29 @@
+{
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "confluent:tags": [
+        "PII"
+      ],
+      "name": "birthday",
+      "type": "string"
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  ],
+  "name": "PersonalData",
+  "namespace": "com.csfleExample",
+  "type": "record"
+}

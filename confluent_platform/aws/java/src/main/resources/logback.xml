@@ -1,0 +1,22 @@
+<configuration>
+    <!-- Console appender with clean, readable format -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Application loggers - keep at INFO level -->
+    <logger name="com.example.app" level="INFO"/>
+
+    <!-- Kafka client libraries - reduce verbosity to WARN -->
+    <logger name="org.apache.kafka" level="WARN"/>
+
+    <!-- Confluent Schema Registry client - reduce verbosity to WARN -->
+    <logger name="io.confluent" level="WARN"/>
+
+    <!-- Root logger - default to INFO, silencing DEBUG logs -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

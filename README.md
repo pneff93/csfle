@@ -5,19 +5,30 @@ feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/cur
 well as
 [Client-Side Payload Encryption](https://docs.confluent.io/cloud/current/security/encrypt/cspe.html).
 
-It covers step-by-step guidelines for different KMS via folders:
+## Confluent Cloud Examples
 
-| **Scenario**                                  | **Key Vault**              | **Encryption type** | **KEK shared** |
-|-----------------------------------------------|----------------------------|---------------------|----------------|
-| [Azure - Kotlin](azure/kotlin/README.md)      | Azure Key Vault            | CSFLE               | no             |
-| [Azure - Python](azure/python/README.md)      | Azure Key Vault            | CSFLE               | no             |
-| [HashiCorp](hashicorp/README.md)              | HashiCorp Vault            | CSFLE               | no             |
-| [AWS - Kotlin](aws/kotlin/README.md)          | AWS Key Management Service | CSFLE               | no             |
-| [AWS - Python](aws/python/README.md)          | AWS Key Management Service | CSFLE               | no             |
-| [GCP](gcp/README.md)                          | GCP Key Management Service | CSFLE               | no             |
-| [AWS - Shared](aws_shared_kek/README.md)      | AWS Key Management Service | CSFLE               | yes            |
-| [Azure - SM Connect](azure_connect/README.md) | Azure Key Vault            | CSFLE               | no             |
-| [Azure - CSPE](azure_cspe/README.md)          | Azure Key Vault            | CSPE                | no             |
+Step-by-step guidelines for different KMS integrations with Confluent Cloud:
+
+| **Scenario**                                                  | **Key Vault**              | **Encryption type** | **KEK shared** |
+|---------------------------------------------------------------|----------------------------|---------------------|----------------|
+| [Azure - Kotlin](confluent_cloud/azure/kotlin/README.md)      | Azure Key Vault            | CSFLE               | no             |
+| [Azure - Python](confluent_cloud/azure/python/README.md)      | Azure Key Vault            | CSFLE               | no             |
+| [HashiCorp](confluent_cloud/hashicorp/README.md)              | HashiCorp Vault            | CSFLE               | no             |
+| [AWS - Kotlin](confluent_cloud/aws/kotlin/README.md)          | AWS Key Management Service | CSFLE               | no             |
+| [AWS - Python](confluent_cloud/aws/python/README.md)          | AWS Key Management Service | CSFLE               | no             |
+| [GCP](confluent_cloud/gcp/README.md)                          | GCP Key Management Service | CSFLE               | no             |
+| [AWS - Shared](confluent_cloud/aws_shared_kek/README.md)      | AWS Key Management Service | CSFLE               | yes            |
+| [Azure - SM Connect](confluent_cloud/azure_connect/README.md) | Azure Key Vault            | CSFLE               | no             |
+| [Azure - CSPE](confluent_cloud/azure_cspe/README.md)          | Azure Key Vault            | CSPE                | no             |
+
+## Confluent Platform Examples
+
+Step-by-step guidelines for different KMS integrations with Confluent Platform:
+
+| **Scenario**                                            | **Key Vault**              | **Encryption type** | **KEK shared** |
+|---------------------------------------------------------|----------------------------|---------------------|----------------|
+| [AWS - Java](confluent_platform/aws/java/README.md)     | AWS Key Management Service | CSFLE               | no             |
+| [AWS - Python](confluent_platform/aws/python/README.md) | AWS Key Management Service | CSFLE               | no             |
 
 ## Prerequisites
 

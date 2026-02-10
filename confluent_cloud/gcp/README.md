@@ -10,8 +10,9 @@ As of today, this feature is in Early Access Program.
 
 ## Goal
 
-We will produce personal data to Confluent Cloud in the following form 
-```
+We will produce personal data to Confluent Cloud in the following form
+
+```json
 {
     "id": "0",
     "name": "Anna",
@@ -19,6 +20,7 @@ We will produce personal data to Confluent Cloud in the following form
     "timestamp": "2023-10-07T19:54:21.884Z"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the `birthday` field.
 We then start a consumer with the corresponding configurations to decrypt the field again.
 
@@ -46,7 +48,7 @@ Create a Key Ring and add a key to it. Copy the key's resource name as shown.
 
 ## Download Service Account Credentials
 
-Download the JSON credentials file for the service account you'd like to use (If you don't already have one, just create a new Key in JSON format and it will automatically be downloaded to your computer). 
+Download the JSON credentials file for the service account you'd like to use (If you don't already have one, just create a new Key in JSON format and it will automatically be downloaded to your computer).
 
 You will use the content found here in the Producer/Consumer properties files for `client.id`, `client.email`, `private.key.id`, and `private.key`
 
@@ -73,6 +75,7 @@ curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/s
           }
     }' 
 ```
+
 ## Register Rule
 
 ```shell
@@ -99,6 +102,7 @@ curl --request POST --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/s
 ```
 
 We can check that everything is registered correctly by either executing
+
 ```shell
 curl --request GET --url 'https://psrc-d0vxy.ca-central-1.aws.confluent.cloud/subjects/dgingera-csfle-demo-value/versions/latest' --header 'Authorization: Basic <base64 encoded SR Key:Secret>' | jq
 ```
@@ -110,14 +114,18 @@ or in the CC UI
 ## Producer configuration
 
 ### Gradle
+
 We need to add
+
 ```shell
 implementation("io.confluent:kafka-avro-serializer:7.5.1")
 implementation("io.confluent:kafka-schema-registry-client-encryption-gcp:7.5.1")
 ```
 
 ### Producer
+
 We need to adjust the configuration by adding
+
 ```kotlin
 // Encryption + GCP Creds (Note: All credential info can be found in your Service account's credential JSON file we downloaded in the earlier step)
 settings.setProperty("rule.executors._default_.param.client.id", "<GCP Client ID>")
@@ -131,11 +139,13 @@ settings.setProperty("auto.register.schemas","false")
 ```
 
 We continuously produce data with the encryption (the topic `dgingera-csfle-demo` needs to be created before) by executing
-```
+
+```shell
 ./gradlew run
 ```
 
 We can see in the logs that everything is working fine
+
 ```shell
 11:17:33.077 [Thread-0] INFO  KafkaProducer - Kafka Producer started
 11:17:34.495 [kafka-producer-network-thread | producer-1] INFO  KafkaProducer - event produced to dgingera-csfle-demo
@@ -149,7 +159,8 @@ or check the encrypted field messages in the CC UI
 ## Consumer
 
 Update the Consumer properties file with the same Confluent Cloud cluster, Schema Registry, and GCP credentials you used for the producer and re-run.
-```
+
+```shell
 ./gradlew run
 ```
 

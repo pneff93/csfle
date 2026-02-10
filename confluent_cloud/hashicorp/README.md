@@ -2,20 +2,19 @@
 
 This repository provides a step-by-step demo of the Confluent Cloud feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html).
 As of today, this feature is in Early Access Program.
-This example is configured for daily data encryption key rotation. 
-
+This example is configured for daily data encryption key rotation.
 
 ## Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
-* For clients, Confluent Platform 7.6.0 or later is required. 
-* This example will also work with client versions 7.4.2 or 7.5.1, except for key rotation. 
-
+* For clients, Confluent Platform 7.6.0 or later is required.
+* This example will also work with client versions 7.4.2 or 7.5.1, except for key rotation.
 
 ## Goal
 
-We will produce personal data to Confluent Cloud in the following form 
-```
+We will produce personal data to Confluent Cloud in the following form
+
+```json
 {
     "id": "0",
     "name": "Anna",
@@ -23,6 +22,7 @@ We will produce personal data to Confluent Cloud in the following form
     "timestamp": "2023-10-07T19:54:21.884Z"
 }
 ```
+
 However, we set up the corresponding configurations to encrypt the `birthday` field.
 We then start a consumer with the corresponding configurations to decrypt the field again.
 
@@ -45,14 +45,12 @@ Under enable new secret engine we create a transit and a key.
 
 ![](HCVaultKey.png)
 
-
-
 ## Set up credentials and register schema
 
 We register the schema with setting `PII` to the birthday field and defining the encryption rule
 
-Copy the file `sample.env` to `<yourname>.env`, and fill in the secrets and endpoints as shown below. 
-Then source the environment: `source <yourname>.env`. 
+Copy the file `sample.env` to `<yourname>.env`, and fill in the secrets and endpoints as shown below.
+Then source the environment: `source <yourname>.env`.
 
 ```shell
 export BOOTSTRAP_SERVERS="<YOUR_BOOTSTRAP_SERVERS>"
@@ -89,6 +87,7 @@ curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions"
           }
     }' 
 ```
+
 ## Register Rule
 
 ```shell
@@ -118,6 +117,7 @@ curl --request POST --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions"
 ```
 
 We can check that everything is registered correctly by either executing
+
 ```shell
 curl --request GET \
   --url "${SR_REST_ENDPOINT}/subjects/${TOPIC}-value/versions/latest" \
@@ -131,14 +131,18 @@ or in the CC UI
 ## Producer configuration
 
 ### Gradle
+
 We need to add
+
 ```shell
 implementation("io.confluent:kafka-avro-serializer:7.6.0")
 implementation("io.confluent:kafka-schema-registry-client-encryption-hcvault:7.6.0")
 ```
 
 ### Producer
+
 We need to adjust the configuration by adding
+
 ```kotlin
 // Encryption
 settings.setProperty("rule.executors._default_.param.token.id", "root-token")
@@ -148,13 +152,15 @@ settings.setProperty("use.latest.version", "true")
 settings.setProperty("auto.register.schemas","false")
 ```
 
-Make sure all environment variables as mentioned above are defined. 
+Make sure all environment variables as mentioned above are defined.
 Then we continuously produce data encrypted data (the topic `csfle-test` needs to be created before) by executing
-```
+
+```shell
 ./gradlew run
 ```
 
 We can see in the logs that everything is working fine
+
 ```shell
 [kafka-producer-network-thread | producer-2] INFO  KafkaProducer - event produced to csfle-test
 ```
@@ -165,9 +171,10 @@ or check the encrypted field messages in the CC UI
 
 ## Consumer
 
-Again, make sure that all environment variables as shown above are defined. 
-We can run the consumer from the `KafkaConsumer` directory with: 
-```
+Again, make sure that all environment variables as shown above are defined.
+We can run the consumer from the `KafkaConsumer` directory with:
+
+```shell
 ./gradlew run
 ```
 

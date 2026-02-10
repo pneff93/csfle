@@ -44,9 +44,9 @@ the [AWS KMS Setup section](../README.md#aws-kms-setup) in the parent README.
 
 You'll need:
 
-- AWS KMS Key ARN (e.g., `arn:aws:kms:eu-central-1:123456789:key/xxx-xxx-xxx`)
-- AWS Access Key ID
-- AWS Secret Access Key
+* AWS KMS Key ARN (e.g., `arn:aws:kms:eu-central-1:123456789:key/xxx-xxx-xxx`)
+* AWS Access Key ID
+* AWS Secret Access Key
 
 ### 3. Environment Variables
 
@@ -73,7 +73,6 @@ Edit `../.env` with your configuration values:
 | **Auto Offset Reset**       | `KAFKA_AUTO_OFFSET_RESET` | `earliest`                  |
 
 > ⚠️ **Security:** Never commit the `.env` file to version control as it contains sensitive credentials!
-
 > 💡 **Note:** Confluent Platform runs locally using PLAINTEXT protocol (no SASL/SSL) for Kafka and no authentication for
 > Schema Registry. However, AWS KMS is still used for field-level encryption.
 

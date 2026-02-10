@@ -25,10 +25,11 @@ Step-by-step guidelines for different KMS integrations with Confluent Cloud:
 
 Step-by-step guidelines for different KMS integrations with Confluent Platform:
 
-| **Scenario**                                            | **Key Vault**              | **Encryption type** | **KEK shared** |
-|---------------------------------------------------------|----------------------------|---------------------|----------------|
-| [AWS - Java](confluent_platform/aws/java/README.md)     | AWS Key Management Service | CSFLE               | no             |
-| [AWS - Python](confluent_platform/aws/python/README.md) | AWS Key Management Service | CSFLE               | no             |
+| **Scenario**                                                | **Key Vault**              | **Encryption type** | **KEK shared** |
+|-------------------------------------------------------------|----------------------------|---------------------|----------------|
+| [AWS - Java](confluent_platform/aws/java/README.md)         | AWS Key Management Service | CSFLE               | no             |
+| [AWS - Python](confluent_platform/aws/python/README.md)     | AWS Key Management Service | CSFLE               | no             |
+| [Azure - Python](confluent_platform/azure/python/README.md) | Azure Key Vault            | CSFLE               | no             |
 
 ## Prerequisites
 

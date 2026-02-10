@@ -1,5 +1,3 @@
-import os
-
 from confluent_kafka import Consumer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer

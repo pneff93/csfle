@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timezone, date
 
 from confluent_kafka import Producer
-from confluent_kafka.schema_registry import Schema, SchemaRegistryClient
+from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.schema_registry.rules.encryption.awskms.aws_driver import AwsKmsDriver
 from confluent_kafka.schema_registry.rules.encryption.encrypt_executor import FieldEncryptionExecutor
@@ -51,9 +51,6 @@ def main():
         schema_str = f.read()
 
     schema_registry_client = SchemaRegistryClient(schema_registry_conf)
-
-    # subject = f"{topic}-value"
-    # schema_registry_client.register_schema(subject, Schema(schema_str, "AVRO", [], None))
 
     ser_conf = {'auto.register.schemas': False, 'use.latest.version': True}
     avro_serializer = AvroSerializer(schema_registry_client, schema_str, personal_data_to_dict, conf=ser_conf)

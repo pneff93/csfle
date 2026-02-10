@@ -1,13 +1,11 @@
 # Client-Side Field Level Encryption (CSFLE) & Client-Side Payload Encryption (CSPE)
 
-This repository provides demos
-for [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html)
-and [Client-Side Payload Encryption](https://docs.confluent.io/cloud/current/security/encrypt/cspe.html) for both
-Confluent Cloud and Confluent Platform.
+This repository provides several demos of the Confluent Cloud
+feature [Client-Side Field Level Encryption](https://docs.confluent.io/cloud/current/clusters/csfle/overview.html) as
+well as
+[Client-Side Payload Encryption](https://docs.confluent.io/cloud/current/security/encrypt/cspe.html).
 
-## Confluent Cloud Examples
-
-These examples demonstrate CSFLE and CSPE with Confluent Cloud and various KMS providers.
+It covers step-by-step guidelines for different KMS via folders:
 
 | **Scenario**                                  | **Key Vault**              | **Encryption type** | **KEK shared** |
 |-----------------------------------------------|----------------------------|---------------------|----------------|
@@ -21,24 +19,10 @@ These examples demonstrate CSFLE and CSPE with Confluent Cloud and various KMS p
 | [Azure - SM Connect](azure_connect/README.md) | Azure Key Vault            | CSFLE               | no             |
 | [Azure - CSPE](azure_cspe/README.md)          | Azure Key Vault            | CSPE                | no             |
 
-**Prerequisites:**
+## Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
-* For clients, Confluent Platform 7.4.2 or 7.5.1 are required
-
-## Confluent Platform Examples
-
-These examples demonstrate CSFLE with a local Confluent Platform deployment and various KMS providers.
-
-| **Scenario**                                            | **Key Vault**              | **Language** |
-|---------------------------------------------------------|----------------------------|--------------|
-| [AWS - Java](confluent_platform/aws/java/README.md)     | AWS Key Management Service | Java         |
-| [AWS - Python](confluent_platform/aws/python/README.md) | AWS Key Management Service | Python       |
-
-**Prerequisites:**
-
-* Docker and Docker Compose
-* Access to the respective KMS provider (e.g., AWS account with KMS access)
+* For clients, Confluent Platform 7.4.2 or 7.5.1 are required.
 
 ## Goal
 

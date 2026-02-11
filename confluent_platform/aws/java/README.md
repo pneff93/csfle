@@ -81,7 +81,7 @@ Edit `../.env` with your configuration values:
 From the parent directory, start Confluent Platform using Docker Compose:
 
 ```shell
-cd /Users/dimi/my/forks/csfle/confluent_platform
+cd ../..
 docker compose up -d
 ```
 
@@ -98,7 +98,6 @@ You can also access [Control Center](http://localhost:9021/) to monitor the clus
 Compile the Java project and generate Avro classes:
 
 ```shell
-cd /Users/dimi/my/forks/csfle/confluent_platform/aws/java
 mvn clean compile
 ```
 
@@ -286,7 +285,7 @@ set +a
 To stop and remove all Confluent Platform containers:
 
 ```shell
-cd /Users/dimi/my/forks/csfle/confluent_platform
+cd ../..
 docker compose down -v
 ```
 

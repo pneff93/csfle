@@ -79,7 +79,7 @@ Edit `.env` with your configuration values:
 From the parent directory, start Confluent Platform using Docker Compose:
 
 ```shell
-cd /Users/dimi/my/forks/csfle/confluent_platform
+cd ..
 docker compose up -d
 ```
 
@@ -278,7 +278,7 @@ set +a
 To stop and remove all Confluent Platform containers:
 
 ```shell
-cd /Users/dimi/my/forks/csfle/confluent_platform
+cd ..
 docker compose down -v
 ```
 

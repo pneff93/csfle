@@ -1,8 +1,10 @@
 # 🔐 Client-Side Field Level Encryption (CSFLE) & Client-Side Payload Encryption (CSPE)
 
-This repository provides comprehensive demos and step-by-step tutorials for implementing **Client-Side Field Level Encryption (CSFLE)** and **Client-Side Payload Encryption (CSPE)** with Confluent Cloud and Confluent Platform.
+This repository provides demos for implementing **Client-Side Field Level Encryption (CSFLE)** and **Client-Side Payload Encryption (CSPE)** with Confluent Cloud and Confluent Platform.
 
 Encrypt sensitive data at the source before it ever reaches Kafka, ensuring end-to-end data protection and compliance with privacy regulations like GDPR, HIPAA, and CCPA.
+
+> This repository is intended for demonstration purposes only. If you plan to use it in production, you must review and strengthen the security practices accordingly.
 
 ---
 

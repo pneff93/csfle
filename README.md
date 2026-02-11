@@ -34,7 +34,9 @@ Step-by-step guidelines for different KMS integrations with Confluent Platform:
 ## Prerequisites
 
 * Confluent Cloud cluster with Advanced Stream Governance package
-* For clients, Confluent Platform 7.4.2 or 7.5.1 are required.
+* To use CSFLE with Confluent Platform in a **production** cluster you have to use Confluent Platform 8.0 or later.
+* * Confluent Platform 7.9 introduces CSFLE as an Early Access feature and is not supported for production workloads.
+* For clients, Confluent Platform 7.4.2 or 7.5.1 are required
 
 ## Goal
 

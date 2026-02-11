@@ -1,0 +1,2 @@
+# Shared environment variables (may contain secrets)
+.env

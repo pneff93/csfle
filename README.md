@@ -53,7 +53,7 @@ This demo shows how to protect sensitive personal data by encrypting specific fi
 
 ### Example Scenario
 
-We produce personal data to Confluent Cloud in the following form:
+We produce personal data to Confluent Cloud/Confluent Platform in the following form:
 
 ```json
 {

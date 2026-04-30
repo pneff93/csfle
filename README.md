@@ -57,7 +57,7 @@ The producer will generate 20 messages with the following AVRO schema. The birth
 }
 ```
 
-![Video](./generator/assets/demo.mov)
+![Video](./generator/assets/demo.mp4)
 
 ---
 

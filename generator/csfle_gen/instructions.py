@@ -1,5 +1,4 @@
 """Rich-rendered post-generation summary shown after `csfle-gen new` completes."""
-import re
 from pathlib import Path
 
 from rich.console import Console
@@ -11,12 +10,6 @@ from csfle_gen.models import GenerationConfig
 from csfle_gen.renderer import PLACEHOLDER
 
 CONSOLE = Console()
-
-# projects/<project>/locations/<location>/keyRings/<ring>/cryptoKeys/<key>
-_GCP_KEY_RE = re.compile(
-    r"^projects/(?P<project>[^/]+)/locations/(?P<location>[^/]+)"
-    r"/keyRings/(?P<keyring>[^/]+)/cryptoKeys/(?P<key>[^/]+)$"
-)
 
 LANG_STEPS: dict[str, dict[str, tuple[str, str] | str]] = {
     "java": {
@@ -86,40 +79,6 @@ def _bash(text: str) -> Syntax:
     return Syntax(text, "bash", background_color="default", padding=(0, 1))
 
 
-def _gcp_iam_hint(config: GenerationConfig) -> str | None:
-    """Return a faint reminder of the gcloud IAM binding required for the SA to use the KEK.
-
-    Pre-fills the gcloud command from the values the user provided in the wizard,
-    leaving `<placeholders>` for anything missing (skipped private-key fields, etc.).
-    Returns None for non-GCP configs so the caller can `if hint: print(hint)`.
-    """
-    if config.kms != "gcp":
-        return None
-
-    parts = {"project": "<project>", "location": "<location>", "keyring": "<keyring>", "key": "<key>"}
-    kms_key_id = config.kms_params.get("kms_key_id") or ""
-    match = _GCP_KEY_RE.match(kms_key_id)
-    if match:
-        parts.update(match.groupdict())
-
-    sa_email = config.kms_params.get("client_email") or "<service-account-email>"
-
-    cmd = (
-        f"gcloud kms keys add-iam-policy-binding {parts['key']} \\\n"
-        f"  --keyring={parts['keyring']} \\\n"
-        f"  --location={parts['location']} \\\n"
-        f"  --project={parts['project']} \\\n"
-        f'  --member="serviceAccount:{sa_email}" \\\n'
-        f'  --role="roles/cloudkms.cryptoKeyEncrypterDecrypter"'
-    )
-    indented = "\n".join(f"     {line}" for line in cmd.splitlines())
-    return (
-        "[dim]💡 The service account in `.env` needs permission to use the KEK. "
-        "If it doesn't already, grant it:\n\n"
-        f"{indented}\n[/dim]"
-    )
-
-
 def print_next_steps(
     config: GenerationConfig,
     output_dir: Path,
@@ -169,11 +128,6 @@ def print_next_steps(
     for i, (label, cmd) in enumerate(steps, start=1):
         CONSOLE.print(f"\n  [bold cyan]{i}.[/bold cyan] {label}")
         CONSOLE.print(_bash(cmd))
-
-    gcp_hint = _gcp_iam_hint(config)
-    if gcp_hint:
-        CONSOLE.print()
-        CONSOLE.print(gcp_hint)
 
     CONSOLE.print()
     CONSOLE.print(f"[dim]Full reference: {rel_to_cwd / 'README.md'}[/dim]")

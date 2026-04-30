@@ -1,0 +1,32 @@
+{% import "dotnet/partials/kms_" + kms + ".j2" as kms_p with context %}
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net{{ dotnet_version }}</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CsfleDemo.Producer</RootNamespace>
+    <AssemblyName>CsfleDemo.Producer</AssemblyName>
+    <!-- Allow running on a newer .NET major version (e.g. net10.0) if net{{ dotnet_version }} runtime isn't installed. -->
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="{{ confluent_dotnet_version }}" />
+    <PackageReference Include="Confluent.SchemaRegistry" Version="{{ confluent_dotnet_version }}" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="{{ confluent_dotnet_version }}" />
+    <PackageReference Include="Confluent.SchemaRegistry.Encryption" Version="{{ confluent_dotnet_version }}" />
+    {{ kms_p.package_reference() | indent(4) }}
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\avro\personal_data.avsc" Link="avro\personal_data.avsc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

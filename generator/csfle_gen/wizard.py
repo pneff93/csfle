@@ -20,10 +20,10 @@ class WizardCancelled(Exception):
 
 @dataclass(frozen=True)
 class _KmsField:
-    config_key: str   # key under GenerationConfig.kms_params
-    label: str        # prompt text shown to user
-    env_var: str      # env-var name discovery looks up for the default
-    secret: bool      # if True, use password() prompt; if blank → None → <FILL_ME>
+    config_key: str  # key under GenerationConfig.kms_params
+    label: str  # prompt text shown to user
+    env_var: str  # env-var name discovery looks up for the default
+    secret: bool  # if True, use password() prompt; if blank → None → <FILL_ME>
 
 
 _KMS_FIELDS: dict[Kms, list[_KmsField]] = {
@@ -51,7 +51,8 @@ _KMS_FIELDS: dict[Kms, list[_KmsField]] = {
         _KmsField("private_key", "GCP service account private_key (paste with quotes)", "GCP_PRIVATE_KEY", True),
     ],
     "hashicorp": [
-        _KmsField("kms_key_id", "Vault Transit KEK URL (e.g. http://127.0.0.1:8200/transit/keys/csfle)", "HCVAULT_KMS_KEY_ID", False),
+        _KmsField("kms_key_id", "Vault Transit KEK URL (e.g. http://127.0.0.1:8200/transit/keys/csfle)",
+                  "HCVAULT_KMS_KEY_ID", False),
         _KmsField("vault_addr", "Vault address (VAULT_ADDR)", "VAULT_ADDR", False),
         _KmsField("vault_token", "Vault token (VAULT_TOKEN)", "VAULT_TOKEN", True),
     ],
@@ -124,25 +125,30 @@ def sanitize_gcp_private_key(raw: str) -> str:
     return value
 
 
-def run_wizard(repo_root: Path) -> tuple[GenerationConfig, Path]:
+def run_wizard(env_path: Path) -> tuple[GenerationConfig, Path]:
     console = Console()
 
     console.rule("[bold]CSFLE client generator[/bold]")
+
+    defaults = discover_defaults(env_path)
+    if defaults:
+        console.print(f"[dim]Loaded defaults from {env_path}.[/dim]")
 
     # Phase 1 — project basics
     project_name = _ask_or_cancel(
         questionary.text("Project name", validate=_validate_project_name)
     ).strip()
-    description = _ask_or_cancel(questionary.text("Short description (optional)")).strip()
 
     # Phase 1b — client language
     language: Language = _ask_or_cancel(
         questionary.select(
             "Client language",
             choices=[
-                questionary.Choice("Python", value="python"),
                 questionary.Choice("Java (Maven)", value="java"),
                 questionary.Choice("JavaScript (Node.js)", value="javascript"),
+                questionary.Choice("Python", value="python"),
+                questionary.Choice("Go", value="go"),
+                questionary.Choice(".NET (C#)", value="dotnet"),
             ],
         )
     )
@@ -167,12 +173,6 @@ def run_wizard(repo_root: Path) -> tuple[GenerationConfig, Path]:
             ],
         )
     )
-
-    defaults = discover_defaults(target, kms, repo_root)
-    if defaults:
-        console.print(
-            f"[dim]Found existing config in the repo for {target}/{kms} — using its values as defaults.[/dim]"
-        )
 
     # Phase 4 — Kafka + SR
     if target == "cloud":
@@ -244,7 +244,7 @@ def run_wizard(repo_root: Path) -> tuple[GenerationConfig, Path]:
         kms_params[field.config_key] = _optional(cleaned)
 
     # Phase 6 — output dir
-    default_output = repo_root / "generated" / project_name
+    default_output = Path.cwd() / "generated" / project_name
     output_str = _ask_or_cancel(
         questionary.path("Output directory", default=str(default_output), only_directories=True)
     )
@@ -252,17 +252,16 @@ def run_wizard(repo_root: Path) -> tuple[GenerationConfig, Path]:
 
     if output_dir.exists() and any(output_dir.iterdir()):
         if not _ask_or_cancel(
-            questionary.confirm(
-                f"{output_dir} is not empty — overwrite files in it?",
-                default=False,
-            )
+                questionary.confirm(
+                    f"{output_dir} is not empty — overwrite files in it?",
+                    default=False,
+                )
         ):
             raise WizardCancelled()
 
     # Build the config now so the summary can show derived names (topic, kek_name, …)
     config = GenerationConfig(
         project_name=project_name,
-        description=description,
         language=language,
         target=target,
         kms=kms,

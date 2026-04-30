@@ -1,0 +1,8 @@
+module {{ project_name }}
+
+go {{ go_version }}
+
+require (
+	github.com/confluentinc/confluent-kafka-go/v2 v{{ confluent_go_version }}
+	github.com/joho/godotenv v{{ godotenv_version }}
+)

@@ -10,7 +10,7 @@ from csfle_gen.renderer import (
     _validate_macros,
 )
 
-LANGUAGES = ["python", "java", "javascript"]
+LANGUAGES = ["python", "java", "javascript", "dotnet", "go"]
 
 
 @pytest.mark.parametrize("language", LANGUAGES)

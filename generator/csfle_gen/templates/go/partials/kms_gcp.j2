@@ -1,0 +1,87 @@
+{% macro driver_import() -%}
+"github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/rules/encryption/gcpkms"
+{%- endmacro %}
+
+{% macro driver_register() -%}
+gcpkms.Register()
+{%- endmacro %}
+
+{% macro rule_config_func() -%}
+// GetGcpRuleConfig returns Google Cloud service-account credentials packaged
+// for the Avro serializer/deserializer RuleConfig. The Confluent Go GCP KMS
+// driver reads `client.id`, `client.email`, `private.key.id`, and
+// `private.key` from this map.
+//
+// godotenv preserves the literal `\n` escapes inside the double-quoted PEM,
+// so we unescape them here before handing the key to the driver.
+func GetGcpRuleConfig() (map[string]string, error) {
+	clientID, err := getEnv("GCP_CLIENT_ID")
+	if err != nil {
+		return nil, err
+	}
+	clientEmail, err := getEnv("GCP_CLIENT_EMAIL")
+	if err != nil {
+		return nil, err
+	}
+	privateKeyID, err := getEnv("GCP_PRIVATE_KEY_ID")
+	if err != nil {
+		return nil, err
+	}
+	privateKey, err := getEnv("GCP_PRIVATE_KEY")
+	if err != nil {
+		return nil, err
+	}
+	return map[string]string{
+		"client.id":      clientID,
+		"client.email":   clientEmail,
+		"private.key.id": privateKeyID,
+		"private.key":    strings.ReplaceAll(privateKey, "\\n", "\n"),
+	}, nil
+}
+{%- endmacro %}
+
+{% macro rule_config_func_call() -%}
+GetGcpRuleConfig
+{%- endmacro %}
+
+{% macro config_validate_keys() -%}
+"GCP_KMS_KEY_NAME",
+"GCP_KMS_TYPE",
+"GCP_KMS_KEY_ID",
+"GCP_CLIENT_ID",
+"GCP_CLIENT_EMAIL",
+"GCP_PRIVATE_KEY_ID",
+"GCP_PRIVATE_KEY",
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# Google Cloud KMS Configuration (for field-level encryption)
+GCP_KMS_KEY_NAME={{ kek_name }}
+GCP_KMS_TYPE=gcp-kms
+GCP_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# Google Cloud Service Account fields (extracted from the SA JSON file)
+GCP_CLIENT_ID={{ kms_params.client_id or '<FILL_ME>' }}
+GCP_CLIENT_EMAIL={{ kms_params.client_email or '<FILL_ME>' }}
+GCP_PRIVATE_KEY_ID={{ kms_params.private_key_id or '<FILL_ME>' }}
+# Single-line PEM with literal `\n` escapes; the surrounding double quotes are required so
+# godotenv preserves the value as a string. config.go unescapes the `\n` into real newlines
+# before passing the key to gcpkms.
+GCP_PRIVATE_KEY="{{ kms_params.private_key or '<FILL_ME>' }}"
+{%- endmacro %}
+
+{% macro kms_type() -%}
+gcp-kms
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **Google Cloud KMS**. You'll need:
+
+* A **Google Cloud KMS keyring + key** (the KEK). The resource ID has the form `projects/<project>/locations/<loc>/keyRings/<ring>/cryptoKeys/<key>`.
+* A **service account** with `Cloud KMS CryptoKey Encrypter/Decrypter` role on that key.
+* The service account's JSON key file. Open it and copy the four fields `client_id`, `client_email`, `private_key_id`, and `private_key` into your `.env`.
+
+> ⚠️ **Do not append `/cryptoKeyVersions/N`** to `GCP_KMS_KEY_ID`. Version-scoped resources are encrypt-only and CSFLE will fail on the very first produce when it tries to decrypt the DEK. Use the `cryptoKey` itself.
+
+> **Note on `GCP_PRIVATE_KEY`:** the value is a multi-line PEM string with literal `\n` escapes. Wrap it in double quotes in `.env` so `godotenv` preserves it as a single string; `GetGcpRuleConfig` then converts the `\n` escapes into real newlines before handing the key to the driver.
+{%- endmacro %}

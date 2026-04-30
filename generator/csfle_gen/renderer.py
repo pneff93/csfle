@@ -77,6 +77,53 @@ LANGUAGE_MACRO_CONTRACT: dict[str, dict[str, frozenset[str]]] = {
             }
         ),
     },
+    "dotnet": {
+        "kms": frozenset(
+            {
+                "driver_using",
+                "driver_class",
+                "package_reference",
+                "rule_config_method",
+                "rule_config_method_call",
+                "config_validate_keys",
+                "env_vars",
+                "kms_type",
+                "readme_section",
+            }
+        ),
+        "target": frozenset(
+            {
+                "producer_config_extras",
+                "sr_config_extras",
+                "config_validate_keys",
+                "env_vars",
+                "readme_section",
+            }
+        ),
+    },
+    "go": {
+        "kms": frozenset(
+            {
+                "driver_import",
+                "driver_register",
+                "rule_config_func",
+                "rule_config_func_call",
+                "config_validate_keys",
+                "env_vars",
+                "kms_type",
+                "readme_section",
+            }
+        ),
+        "target": frozenset(
+            {
+                "kafka_extras",
+                "sr_extras",
+                "config_validate_keys",
+                "env_vars",
+                "readme_section",
+            }
+        ),
+    },
 }
 
 PLACEHOLDER = "<FILL_ME>"
@@ -105,6 +152,23 @@ class MacroContractError(Exception):
     pass
 
 
+def _tab_indent_filter(text: str, count: int = 1) -> str:
+    """Indent every line *except the first* by `count` tab characters.
+
+    Mirrors Jinja2's built-in `| indent(n)` (which uses spaces) but with tabs,
+    so it can be used inside Go templates where tabs are the idiomatic indent.
+    """
+    lines = text.splitlines()
+    if not lines:
+        return text
+    pad = "\t" * count
+    head, *tail = lines
+    rendered = "\n".join([head] + [(pad + line if line else line) for line in tail])
+    if text.endswith("\n"):
+        rendered += "\n"
+    return rendered
+
+
 def _env_keys_filter(text: str) -> str:
     """Convert a KEY=VALUE block into `_get_env('KEY')` lines, preserving order.
 
@@ -131,6 +195,7 @@ def _build_env() -> Environment:
         keep_trailing_newline=True,
     )
     env.filters["env_keys"] = _env_keys_filter
+    env.filters["tab_indent"] = _tab_indent_filter
     return env
 
 

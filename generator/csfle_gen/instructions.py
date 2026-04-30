@@ -18,6 +18,34 @@ _GCP_KEY_RE = re.compile(
     r"/keyRings/(?P<keyring>[^/]+)/cryptoKeys/(?P<key>[^/]+)$"
 )
 
+LANG_STEPS: dict[str, dict[str, tuple[str, str] | str]] = {
+    "java": {
+        "setup": ("Build the project", "mvn clean compile"),
+        "produce": 'mvn exec:java -Dexec.mainClass="com.example.app.BasicProducer"',
+        "consume": 'mvn exec:java -Dexec.mainClass="com.example.app.BasicConsumer"',
+    },
+    "javascript": {
+        "setup": ("Install dependencies", "npm install"),
+        "produce": "npm run produce",
+        "consume": "npm run consume",
+    },
+    "dotnet": {
+        "setup": ("Build the projects", "dotnet build Producer\ndotnet build Consumer"),
+        "produce": "dotnet run --project Producer",
+        "consume": "dotnet run --project Consumer",
+    },
+    "go": {
+        "setup": ("Download module dependencies", "go mod tidy"),
+        "produce": "go run ./cmd/producer",
+        "consume": "go run ./cmd/consumer",
+    },
+    "python": {
+        "setup": ("Install dependencies", "pip install -r requirements.txt"),
+        "produce": "python avro_producer.py",
+        "consume": "python avro_consumer.py",
+    },
+}
+
 
 def _file_tree(output_dir: Path, written: list[Path]) -> Tree:
     tree = Tree(f"[bold]{output_dir.name}/[/bold]")
@@ -96,7 +124,7 @@ def print_next_steps(
     config: GenerationConfig,
     output_dir: Path,
     written: list[Path],
-    repo_root: Path,
+    generator_dir: Path,
 ) -> None:
     CONSOLE.print()
     CONSOLE.print(
@@ -110,50 +138,31 @@ def print_next_steps(
     missing = _scan_missing_secrets(output_dir / ".env")
     if missing:
         CONSOLE.print()
-        CONSOLE.print("[yellow]⚠ Fill these placeholders in `.env` before running:[/yellow]")
+        CONSOLE.print(f"[yellow] ⚠️ Fill these placeholders in {output_dir}/.env before running:[/yellow]")
         for key in missing:
             CONSOLE.print(f"  • [bold]{key}[/bold]")
 
-    rel_to_repo = output_dir.relative_to(repo_root) if output_dir.is_relative_to(repo_root) else output_dir
+    cwd = Path.cwd()
+    rel_to_cwd = output_dir.relative_to(cwd) if output_dir.is_relative_to(cwd) else output_dir
 
-    if config.language == "java":
-        steps: list[tuple[str, str]] = [
-            ("Build the project", f"cd {rel_to_repo}\nmvn clean compile"),
-        ]
-    elif config.language == "javascript":
-        steps = [
-            ("Install dependencies", f"cd {rel_to_repo}\nnpm install"),
-        ]
-    else:
-        steps = [
-            ("Install dependencies", f"cd {rel_to_repo}\npip install -r requirements.txt"),
-        ]
+    lang = LANG_STEPS.get(config.language, LANG_STEPS["python"])
+    setup_label, setup_cmd = lang["setup"]
+    steps: list[tuple[str, str]] = [
+        (setup_label, f"cd {rel_to_cwd}\n{setup_cmd}"),
+    ]
 
     if config.target == "platform":
-        platform_dir = (repo_root / "confluent_platform").relative_to(repo_root)
+        compose_dir = generator_dir.relative_to(cwd) if generator_dir.is_relative_to(cwd) else generator_dir
         steps.append((
             "Start Confluent Platform (in another terminal or background)",
-            f"(cd {platform_dir.as_posix()} && docker compose up -d)",
+            f"(cd {compose_dir.as_posix()} && docker compose up -d)",
         ))
 
-    if config.language == "java":
-        steps.extend([
-            ("Create the topic + register schema and encryption rule", "./bootstrap.sh"),
-            ("Produce encrypted records", 'mvn exec:java -Dexec.mainClass="com.example.app.BasicProducer"'),
-            ("Consume + decrypt (in another terminal)", 'mvn exec:java -Dexec.mainClass="com.example.app.BasicConsumer"'),
-        ])
-    elif config.language == "javascript":
-        steps.extend([
-            ("Create the topic + register schema and encryption rule", "./bootstrap.sh"),
-            ("Produce encrypted records", "npm run produce"),
-            ("Consume + decrypt (in another terminal)", "npm run consume"),
-        ])
-    else:
-        steps.extend([
-            ("Create the topic + register schema and encryption rule", "./bootstrap.sh"),
-            ("Produce encrypted records", "python avro_producer.py"),
-            ("Consume + decrypt (in another terminal)", "python avro_consumer.py"),
-        ])
+    steps.extend([
+        ("Create the topic + register schema and encryption rule", "./bootstrap.sh"),
+        ("Produce encrypted records", lang["produce"]),
+        ("Consume + decrypt (in another terminal)", lang["consume"]),
+    ])
 
     CONSOLE.print()
     CONSOLE.print("[bold]Next steps:[/bold]")
@@ -167,4 +176,4 @@ def print_next_steps(
         CONSOLE.print(gcp_hint)
 
     CONSOLE.print()
-    CONSOLE.print(f"[dim]Full reference: {rel_to_repo / 'README.md'}[/dim]")
+    CONSOLE.print(f"[dim]Full reference: {rel_to_cwd / 'README.md'}[/dim]")

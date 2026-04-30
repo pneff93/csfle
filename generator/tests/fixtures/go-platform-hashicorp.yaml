@@ -1,0 +1,15 @@
+project_name: my-platform-hashicorp-go-client
+description: Platform/HashiCorp Vault Go demo client used in snapshot tests.
+language: go
+target: platform
+kms: hashicorp
+kafka:
+  bootstrap_servers: localhost:9091
+schema_registry:
+  url: http://localhost:8081
+kms_params:
+  kms_key_id: http://127.0.0.1:8200/transit/keys/csfle
+  vault_addr: http://127.0.0.1:8200
+  vault_token: example-vault-token
+
+uid: "0036"

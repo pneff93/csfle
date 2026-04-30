@@ -33,7 +33,7 @@ _KMS_FIELDS: dict[Kms, list[_KmsField]] = {
         _KmsField("secret_access_key", "AWS Secret Access Key", "AWS_SECRET_ACCESS_KEY", True),
     ],
     "azure": [
-        _KmsField("kms_key_id", "Azure Key Vault key URL", "AZURE_KMS_KEY_ID", False),
+        _KmsField("kms_key_id", "Azure KMS Key Id (URL)", "AZURE_KMS_KEY_ID", False),
         _KmsField("tenant_id", "Azure Tenant ID", "AZURE_TENANT_ID", False),
         _KmsField("client_id", "Azure Client ID", "AZURE_CLIENT_ID", False),
         _KmsField("client_secret", "Azure Client Secret", "AZURE_CLIENT_SECRET", True),
@@ -41,14 +41,14 @@ _KMS_FIELDS: dict[Kms, list[_KmsField]] = {
     "gcp": [
         _KmsField(
             "kms_key_id",
-            "GCP KMS key (projects/.../cryptoKeys/<key>) — DO NOT include /cryptoKeyVersions/N",
+            "GCP KMS key (projects/.../cryptoKeys/<key>) — ⚠️ DO NOT include /cryptoKeyVersions/N",
             "GCP_KMS_KEY_ID",
             False,
         ),
         _KmsField("client_id", "GCP service account client_id", "GCP_CLIENT_ID", False),
         _KmsField("client_email", "GCP service account client_email", "GCP_CLIENT_EMAIL", False),
         _KmsField("private_key_id", "GCP service account private_key_id", "GCP_PRIVATE_KEY_ID", False),
-        _KmsField("private_key", "GCP service account private_key (paste with quotes)", "GCP_PRIVATE_KEY", True),
+        _KmsField("private_key", "GCP service account private_key — ⚠️ Paste with quotes", "GCP_PRIVATE_KEY", True),
     ],
     "hashicorp": [
         _KmsField("kms_key_id", "Vault Transit KEK URL (e.g. http://127.0.0.1:8200/transit/keys/csfle)",

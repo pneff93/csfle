@@ -85,7 +85,14 @@ Step-by-step guidelines for different KMS integrations with Confluent Platform:
 |---------------------------------------------------------|------------|----------------------------|---------------------|----------------|
 | [AWS](confluent_platform/aws/java/README.md)            | Java       | AWS Key Management Service | CSFLE               | ❌             |
 | [AWS](confluent_platform/aws/python/README.md)          | Python     | AWS Key Management Service | CSFLE               | ❌             |
+| [AWS](confluent_platform/aws/dotnet/README.md)          | .NET       | AWS Key Management Service | CSFLE               | ❌             |
+| [AWS](confluent_platform/aws/go/README.md)              | Go         | AWS Key Management Service | CSFLE               | ❌             |
+| [AWS](confluent_platform/aws/javascript/README.md)      | JavaScript | AWS Key Management Service | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/java/README.md)        | Java       | Azure Key Vault            | CSFLE               | ❌             |
 | [Azure](confluent_platform/azure/python/README.md)      | Python     | Azure Key Vault            | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/dotnet/README.md)      | .NET       | Azure Key Vault            | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/go/README.md)          | Go         | Azure Key Vault            | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/javascript/README.md)  | JavaScript | Azure Key Vault            | CSFLE               | ❌             |
 
 ---
 

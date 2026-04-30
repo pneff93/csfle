@@ -12,6 +12,11 @@ uv run csfle-gen new
 
 That's it. `uv` handles the virtualenv and dependencies; no manual setup needed.
 
+<video width="100%" controls muted autoplay loop>
+  <source src="./assets/demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ## What gets generated
 
 A self-contained project. Common to both languages:

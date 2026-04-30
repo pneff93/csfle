@@ -1,0 +1,27 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.example.app" level="INFO"/>
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="io.confluent" level="WARN"/>
+
+    <!-- Suppress the CSFLE rule executor's verbose decrypt-failure logging.
+         When the rule has OnFailure=NONE (read failures), the executor still
+         logs a WARN with a full stack trace BEFORE swallowing the error.
+         Silenced here so the unauthorized-access demo output stays clean.
+         Re-enable by removing these two lines if you need to debug a rule. -->
+    <logger name="io.confluent.kafka.schemaregistry.encryption.tink" level="ERROR"/>
+    <logger name="io.confluent.kafka.schemaregistry.rules" level="ERROR"/>
+
+    <!-- Silence noisy AWS SDK warnings (e.g., when ~/.aws/credentials contains
+         non-AWS profile markers from other tooling like granted-cli). -->
+    <logger name="software.amazon.awssdk.profiles" level="ERROR"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

@@ -8,6 +8,19 @@ Encrypt sensitive data at the source before it ever reaches Kafka, ensuring end-
 
 ---
 
+## ⚙️ Generator
+
+Want to scaffold a new Python CSFLE client without copy-pasting? Run the interactive generator from [`generator/`](generator/README.md):
+
+```shell
+cd generator
+uv run csfle-gen new
+```
+
+It asks a series of questions about your KMS provider and Confluent target, then writes a ready-to-run client under `generated/<project_name>/`.
+
+---
+
 ## ☁️ Confluent Cloud Examples
 
 Step-by-step guidelines for different KMS integrations with Confluent Cloud:

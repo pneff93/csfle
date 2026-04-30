@@ -1,0 +1,63 @@
+{% import "java/partials/kms_" + kms + ".j2" as kms_p with context %}
+{% import "java/partials/target_" + target + ".j2" as target_p with context %}
+package com.example.app;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
+public class Config {
+    private static final Dotenv dotenv = Dotenv.configure()
+        .directory(".")
+        .ignoreIfMissing()
+        .load();
+
+    public static String getTopic() {
+        return getEnvOrThrow("KAFKA_TOPIC");
+    }
+
+    public static String getBootstrapServers() {
+        return getEnvOrThrow("KAFKA_BOOTSTRAP_SERVERS");
+    }
+
+    public static String getSchemaRegistryUrl() {
+        return getEnvOrThrow("SCHEMA_REGISTRY_URL");
+    }
+
+    public static String getConsumerGroupId() {
+        return getEnvOrThrow("KAFKA_GROUP_ID");
+    }
+
+    public static String getAutoOffsetReset() {
+        return getEnvOrThrow("KAFKA_AUTO_OFFSET_RESET");
+    }
+
+{% set target_methods = target_p.config_methods() | trim %}
+{% if target_methods %}
+    {{ target_methods | indent(4) }}
+
+{% endif %}
+    {{ kms_p.config_methods() | indent(4) }}
+
+    private static String getEnvOrThrow(String key) {
+        String value = dotenv.get(key);
+        if (value == null) {
+            throw new IllegalStateException(
+                "Missing required configuration: " + key + "\n" +
+                "Edit .env to set this value."
+            );
+        }
+        return value;
+    }
+
+    public static void validateConfig() {
+        getTopic();
+        getBootstrapServers();
+        getSchemaRegistryUrl();
+        getConsumerGroupId();
+        getAutoOffsetReset();
+{% set target_validate = target_p.validate_calls() | trim %}
+{% if target_validate %}
+        {{ target_validate | indent(8) }}
+{% endif %}
+        {{ kms_p.validate_calls() | indent(8) }}
+    }
+}

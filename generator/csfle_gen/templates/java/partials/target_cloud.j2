@@ -47,10 +47,6 @@ SCHEMA_REGISTRY_URL={{ schema_registry.url }}
 SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO={{ schema_registry.basic_auth_user_info or '<FILL_ME>' }}
 {%- endmacro %}
 
-{% macro sr_auth_curl_args() -%}
---header "Authorization: Basic $(printf '%s' "$SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO" | base64 | tr -d '\n')"
-{%- endmacro %}
-
 {% macro readme_section() -%}
 ### 4. Confluent Cloud Setup
 

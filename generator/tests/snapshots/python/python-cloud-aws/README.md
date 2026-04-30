@@ -76,7 +76,7 @@ Create the Kafka topic, register the Avro schema, and register the field-encrypt
 ./bootstrap.sh
 ```
 
-The script sources `.env` and (with the venv active):
+The script is identical across all generated client languages — topic creation runs in an inline Python heredoc (using `confluent-kafka` from the venv you set up above), schema and rule registration use plain `curl`. It:
 
 1. Creates the Kafka topic `my-cloud-aws-client-0005` (idempotent — safe to re-run).
 2. Registers the schema for `my-cloud-aws-client-0005-value` with the `birthday` field tagged as `PII`.

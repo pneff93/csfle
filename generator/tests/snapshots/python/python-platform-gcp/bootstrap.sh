@@ -5,8 +5,16 @@
 #   2. Registers the Avro schema
 #   3. Registers the field-encryption rule
 #
-# Run from the project directory with the venv active:
-#   source venv/bin/activate
+# This script is intentionally identical across all generated client
+# languages — topic creation runs in an inline Python heredoc so we don't
+# need a per-language admin client. Schema + rule registration are pure curl.
+#
+# Prerequisites:
+#   • bash, curl
+#   • python (3.8+) with `confluent-kafka` installed
+#       pip install confluent-kafka         # or use a venv if you prefer
+#
+# Run from the project directory:
 #   ./bootstrap.sh
 #
 set -euo pipefail
@@ -29,11 +37,9 @@ import sys
 
 from confluent_kafka.admin import AdminClient, NewTopic
 
-import config
+admin_conf = {"bootstrap.servers": os.environ["KAFKA_BOOTSTRAP_SERVERS"]}
 
-config.validate_config()
-admin = AdminClient(config.get_producer_config())
-
+admin = AdminClient(admin_conf)
 topic = NewTopic(
     os.environ["KAFKA_TOPIC"],
     num_partitions=1,

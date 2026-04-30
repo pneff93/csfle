@@ -2,8 +2,7 @@
 import pytest
 
 from csfle_gen.renderer import (
-    KMS_REQUIRED_MACROS,
-    TARGET_REQUIRED_MACROS,
+    LANGUAGE_MACRO_CONTRACT,
     MacroContractError,
     TEMPLATES_DIR,
     _build_env,
@@ -11,28 +10,35 @@ from csfle_gen.renderer import (
     _validate_macros,
 )
 
+LANGUAGES = ["python", "java", "javascript"]
 
-def test_macro_contract_passes_for_all_partials() -> None:
+
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_macro_contract_passes_for_all_partials(language: str) -> None:
     env = _build_env()
-    _validate_macros(env, "python")
+    _validate_macros(env, language)
 
 
-def test_kms_partials_define_all_required_macros() -> None:
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_kms_partials_define_all_required_macros(language: str) -> None:
     env = _build_env()
-    partials_dir = TEMPLATES_DIR / "python" / "partials"
+    partials_dir = TEMPLATES_DIR / language / "partials"
+    required = LANGUAGE_MACRO_CONTRACT[language]["kms"]
     for partial in partials_dir.glob("kms_*.j2"):
         defined = _macros_in(env, partial.read_text())
-        missing = KMS_REQUIRED_MACROS - defined
-        assert not missing, f"{partial.name} missing macros: {missing}"
+        missing = required - defined
+        assert not missing, f"{language}/{partial.name} missing macros: {missing}"
 
 
-def test_target_partials_define_all_required_macros() -> None:
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_target_partials_define_all_required_macros(language: str) -> None:
     env = _build_env()
-    partials_dir = TEMPLATES_DIR / "python" / "partials"
+    partials_dir = TEMPLATES_DIR / language / "partials"
+    required = LANGUAGE_MACRO_CONTRACT[language]["target"]
     for partial in partials_dir.glob("target_*.j2"):
         defined = _macros_in(env, partial.read_text())
-        missing = TARGET_REQUIRED_MACROS - defined
-        assert not missing, f"{partial.name} missing macros: {missing}"
+        missing = required - defined
+        assert not missing, f"{language}/{partial.name} missing macros: {missing}"
 
 
 def test_missing_macro_raises_clear_error(tmp_path, monkeypatch) -> None:

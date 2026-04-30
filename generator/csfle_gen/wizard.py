@@ -142,6 +142,7 @@ def run_wizard(repo_root: Path) -> tuple[GenerationConfig, Path]:
             choices=[
                 questionary.Choice("Python", value="python"),
                 questionary.Choice("Java (Maven)", value="java"),
+                questionary.Choice("JavaScript (Node.js)", value="javascript"),
             ],
         )
     )

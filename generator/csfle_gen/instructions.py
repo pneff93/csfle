@@ -120,6 +120,10 @@ def print_next_steps(
         steps: list[tuple[str, str]] = [
             ("Build the project", f"cd {rel_to_repo}\nmvn clean compile"),
         ]
+    elif config.language == "javascript":
+        steps = [
+            ("Install dependencies", f"cd {rel_to_repo}\nnpm install"),
+        ]
     else:
         steps = [
             ("Install dependencies", f"cd {rel_to_repo}\npip install -r requirements.txt"),
@@ -137,6 +141,12 @@ def print_next_steps(
             ("Create the topic + register schema and encryption rule", "./bootstrap.sh"),
             ("Produce encrypted records", 'mvn exec:java -Dexec.mainClass="com.example.app.BasicProducer"'),
             ("Consume + decrypt (in another terminal)", 'mvn exec:java -Dexec.mainClass="com.example.app.BasicConsumer"'),
+        ])
+    elif config.language == "javascript":
+        steps.extend([
+            ("Create the topic + register schema and encryption rule", "./bootstrap.sh"),
+            ("Produce encrypted records", "npm run produce"),
+            ("Consume + decrypt (in another terminal)", "npm run consume"),
         ])
     else:
         steps.extend([

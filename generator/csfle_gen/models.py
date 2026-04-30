@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, model_validator
 
 Target = Literal["cloud", "platform"]
 Kms = Literal["aws", "azure", "gcp", "hashicorp"]
-Language = Literal["python", "java"]
+Language = Literal["python", "java", "javascript"]
 
 
 def _random_uid() -> str:
@@ -47,6 +47,8 @@ class GenerationConfig(BaseModel):
     confluent_java_version: str = "7.9.4"
     kafka_clients_version: str = "3.9.1"
     avro_version: str = "1.12.1"
+    node_min_version: str = "18"
+    confluent_js_version: str = "1.9.0"
 
     @model_validator(mode="after")
     def _derive_unique_names(self) -> "GenerationConfig":

@@ -30,7 +30,6 @@ LANGUAGE_MACRO_CONTRACT: dict[str, dict[str, frozenset[str]]] = {
                 "sr_config",
                 "env_vars",
                 "readme_section",
-                "sr_auth_curl_args",
             }
         ),
     },
@@ -53,16 +52,32 @@ LANGUAGE_MACRO_CONTRACT: dict[str, dict[str, frozenset[str]]] = {
                 "config_methods",
                 "validate_calls",
                 "env_vars",
-                "sr_auth_curl_args",
+                "readme_section",
+            }
+        ),
+    },
+    "javascript": {
+        "kms": frozenset(
+            {
+                "driver_class",
+                "rule_config",
+                "config_validate_keys",
+                "env_vars",
+                "kms_type",
+                "readme_section",
+            }
+        ),
+        "target": frozenset(
+            {
+                "kafka_options",
+                "sr_options",
+                "config_validate_keys",
+                "env_vars",
                 "readme_section",
             }
         ),
     },
 }
-
-# Kept as module-level aliases for backward compat with tests that import them.
-KMS_REQUIRED_MACROS = LANGUAGE_MACRO_CONTRACT["python"]["kms"]
-TARGET_REQUIRED_MACROS = LANGUAGE_MACRO_CONTRACT["python"]["target"]
 
 PLACEHOLDER = "<FILL_ME>"
 
@@ -170,19 +185,26 @@ def _context(config: GenerationConfig) -> dict:
     }
 
 
-def render(config: GenerationConfig, output_dir: Path) -> list[Path]:
-    language = config.language
-    env = _build_env()
-    _validate_macros(env, language)
+def _emit_tree(
+    src_root: Path,
+    output_dir: Path,
+    env: Environment,
+    config: GenerationConfig,
+    written: list[Path],
+    seen_rels: set[Path],
+) -> None:
+    """Walk one source tree and emit each file into output_dir.
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-    written: list[Path] = []
-
-    shared_dir = TEMPLATES_DIR / language / "shared"
-    for src in sorted(shared_dir.rglob("*")):
+    `.j2` files are rendered (with `.env.example.j2` also emitting `.env` in the
+    same pass); other files are copied verbatim. Tracks `seen_rels` to enforce
+    that no two source trees ever produce the same output path.
+    """
+    if not src_root.is_dir():
+        return
+    for src in sorted(src_root.rglob("*")):
         if not src.is_file():
             continue
-        rel = src.relative_to(shared_dir)
+        rel = src.relative_to(src_root)
         dst = output_dir / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
 
@@ -190,23 +212,46 @@ def render(config: GenerationConfig, output_dir: Path) -> list[Path]:
             template_name = str(src.relative_to(TEMPLATES_DIR))
             template = env.get_template(template_name)
 
-            example_dst = output_dir / rel.with_suffix("")
-            example_dst.write_text(template.render(_context(_placeholder_config(config))))
-            written.append(example_dst)
-
-            env_dst = output_dir / ".env"
-            env_dst.write_text(template.render(_context(config)))
-            written.append(env_dst)
+            for out_rel, ctx in (
+                (rel.with_suffix(""), _context(_placeholder_config(config))),
+                (Path(".env"), _context(config)),
+            ):
+                if out_rel in seen_rels:
+                    raise RuntimeError(f"Duplicate output path from template trees: {out_rel}")
+                seen_rels.add(out_rel)
+                (output_dir / out_rel).write_text(template.render(ctx))
+                written.append(output_dir / out_rel)
         elif src.suffix == ".j2":
             template_name = str(src.relative_to(TEMPLATES_DIR))
             template = env.get_template(template_name)
-            dst = output_dir / rel.with_suffix("")
-            dst.write_text(template.render(_context(config)))
-            if dst.suffix == ".sh":
-                dst.chmod(0o755)
-            written.append(dst)
+            out_rel = rel.with_suffix("")
+            if out_rel in seen_rels:
+                raise RuntimeError(f"Duplicate output path from template trees: {out_rel}")
+            seen_rels.add(out_rel)
+            out_path = output_dir / out_rel
+            out_path.write_text(template.render(_context(config)))
+            if out_path.suffix == ".sh":
+                out_path.chmod(0o755)
+            written.append(out_path)
         else:
+            if rel in seen_rels:
+                raise RuntimeError(f"Duplicate output path from template trees: {rel}")
+            seen_rels.add(rel)
             shutil.copy2(src, dst)
             written.append(dst)
+
+
+def render(config: GenerationConfig, output_dir: Path) -> list[Path]:
+    language = config.language
+    env = _build_env()
+    _validate_macros(env, language)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+    seen_rels: set[Path] = set()
+
+    # Language-specific tree first, then the common tree shared across all languages.
+    _emit_tree(TEMPLATES_DIR / language / "shared", output_dir, env, config, written, seen_rels)
+    _emit_tree(TEMPLATES_DIR / "_common", output_dir, env, config, written, seen_rels)
 
     return written

@@ -8,6 +8,7 @@ A generated CSFLE (Client-Side Field Level Encryption) demo client targeting **C
 
 * Java 17 or later
 * Maven 3.6 or later
+* `python` (3.8+) with `confluent-kafka` installed — used by `bootstrap.sh` for topic creation (`pip install confluent-kafka`)
 * Access to your KMS provider with permission to use the configured KEK
 
 ## 🎯 Goal
@@ -72,9 +73,9 @@ Create the Kafka topic, register the Avro schema, and register the field-encrypt
 ./bootstrap.sh
 ```
 
-The script:
+The script is identical across all generated client languages — topic creation runs in an inline Python heredoc (using `confluent-kafka`), schema and rule registration use plain `curl`. It:
 
-1. Compiles the project (if needed) and runs `BootstrapTopic` to create the Kafka topic `my-cloud-gcp-java-client-0015` (idempotent).
+1. Creates the Kafka topic `my-cloud-gcp-java-client-0015` (idempotent — safe to re-run).
 2. Registers the schema for `my-cloud-gcp-java-client-0015-value` with the `birthday` field tagged as `PII`.
 3. Registers an encryption rule that targets the `PII` tag, using your configured KEK.
 

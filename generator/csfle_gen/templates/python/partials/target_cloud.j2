@@ -35,6 +35,3 @@ In the Confluent Cloud UI, you'll need to:
 4. Define a tag named `PII` in the Schema Registry tag catalog before running `register_schema.sh`.
 {%- endmacro %}
 
-{% macro sr_auth_curl_args() -%}
---header "Authorization: Basic $(printf '%s' "$SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO" | base64 | tr -d '\n')"
-{%- endmacro %}

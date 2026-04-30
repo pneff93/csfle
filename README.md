@@ -10,7 +10,11 @@ Encrypt sensitive data at the source before it ever reaches Kafka, ensuring end-
 
 ## ⚙️ Generator
 
-Want to scaffold a new Python CSFLE client without copy-pasting? Run the interactive generator from [`generator/`](generator/README.md):
+Want to scaffold a new CSFLE client without copy-pasting? Run the interactive generator from [`generator/`](generator/README.md):
+
+Supported clients: Python, Java, Javascript, Go, .NET
+Supported KMS: AWS, Azure, GCP, Hashicorp Vault
+Supports Confluent Cloud and Confluent Platform
 
 ```shell
 cd generator
@@ -18,6 +22,42 @@ uv run csfle-gen new
 ```
 
 It asks a series of questions about your KMS provider and Confluent target, then writes a ready-to-run client under `generated/<project_name>/`.
+
+The producer will generate 20 messages with the following AVRO schema. The birthday field will be encrypted.
+
+```json
+{
+  "name": "PersonalData",
+  "type": "record",
+  "namespace": "com.csfleExample",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "birthday",
+      "type": "string",
+      "confluent:tags": [
+        "PII"
+      ]
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  ]
+}
+```
+
+![Video](./generator/assets/demo.mov)
 
 ---
 

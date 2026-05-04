@@ -81,7 +81,8 @@
                         </goals>
                         <configuration>
                             <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
-                            <outputDirectory>${project.basedir}/src/main/java/com/example/app/</outputDirectory>
+                            <!-- Output to src/main/java so the namespace (com.csfleExample) maps directly to a valid package directory. -->
+                            <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
                             <stringType>String</stringType>
                             <createSetters>true</createSetters>
                         </configuration>

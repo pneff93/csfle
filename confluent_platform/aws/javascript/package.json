@@ -1,0 +1,15 @@
+{
+  "name": "csfle-aws-javascript",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CSFLE demo with Confluent Platform and AWS KMS using @confluentinc/kafka-javascript",
+  "scripts": {
+    "produce": "node producer.js",
+    "consume": "node consumer.js"
+  },
+  "dependencies": {
+    "@confluentinc/kafka-javascript": "^1.9.0",
+    "@confluentinc/schemaregistry": "^1.9.0",
+    "dotenv": "^17.4.2"
+  }
+}

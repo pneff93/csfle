@@ -1,0 +1,18 @@
+project_name: my-cloud-hashicorp-js-client
+description: Cloud/HashiCorp Vault JavaScript demo client used in snapshot tests.
+language: javascript
+target: cloud
+kms: hashicorp
+kafka:
+  bootstrap_servers: pkc-example.us-east-1.aws.confluent.cloud:9092
+  sasl_username: EXAMPLEKAFKAUSERNAME
+  sasl_password: example-kafka-password
+schema_registry:
+  url: https://psrc-example.us-east-2.aws.confluent.cloud
+  basic_auth_user_info: SREXAMPLEKEY:srexamplesecret
+kms_params:
+  kms_key_id: http://127.0.0.1:8200/transit/keys/csfle
+  vault_addr: http://127.0.0.1:8200
+  vault_token: example-vault-token
+
+uid: "0024"

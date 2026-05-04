@@ -1,0 +1,55 @@
+{% macro imports() -%}
+from confluent_kafka.schema_registry.rules.encryption.gcpkms.gcp_driver import GcpKmsDriver
+{%- endmacro %}
+
+{% macro register() -%}
+GcpKmsDriver.register()
+{%- endmacro %}
+
+{% macro setup_credentials() -%}
+# GCP service-account fields are passed via rule.executors._default_.param.* below;
+# without these, the GCP driver silently falls back to Application Default Credentials
+# (gcloud auth application-default login) and authenticates as a different identity.
+{%- endmacro %}
+
+{% macro executor_params() -%}
+'client.id': os.getenv('GCP_CLIENT_ID'),
+'client.email': os.getenv('GCP_CLIENT_EMAIL'),
+'private.key.id': os.getenv('GCP_PRIVATE_KEY_ID'),
+'private.key': os.getenv('GCP_PRIVATE_KEY'),
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# Google Cloud KMS Configuration (for field-level encryption)
+GCP_KMS_KEY_NAME={{ kek_name }}
+GCP_KMS_TYPE=gcp-kms
+GCP_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# Google Cloud Service Account fields (extracted from the SA JSON file)
+GCP_CLIENT_ID={{ kms_params.client_id or '<FILL_ME>' }}
+GCP_CLIENT_EMAIL={{ kms_params.client_email or '<FILL_ME>' }}
+GCP_PRIVATE_KEY_ID={{ kms_params.private_key_id or '<FILL_ME>' }}
+# Single-line PEM with literal `\n` escapes; the surrounding double quotes are required so
+# python-dotenv (and dotenv-java after the in-getter fix) can recognize it as a string value.
+GCP_PRIVATE_KEY="{{ kms_params.private_key or '<FILL_ME>' }}"
+{%- endmacro %}
+
+{% macro pip_deps() -%}
+confluent-kafka[avro,rules]=={{ confluent_kafka_version }}
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **Google Cloud KMS**. You'll need:
+
+* A **Google Cloud KMS keyring + key** (the KEK). The resource ID has the form `projects/<project>/locations/<loc>/keyRings/<ring>/cryptoKeys/<key>`.
+* A **service account** with `Cloud KMS CryptoKey Encrypter/Decrypter` role on that key.
+* The service account's JSON key file. Open it and copy the four fields `client_id`, `client_email`, `private_key_id`, and `private_key` into your `.env`.
+
+> ⚠️ **Do not append `/cryptoKeyVersions/N`** to `GCP_KMS_KEY_ID`. Version-scoped resources are encrypt-only and CSFLE will fail on the very first produce when it tries to decrypt the DEK. Use the `cryptoKey` itself.
+
+> **Note on `GCP_PRIVATE_KEY`:** the value is a multi-line PEM string with literal `\n` escapes. Wrap it in double quotes in `.env` so `python-dotenv` preserves the newlines.
+{%- endmacro %}
+
+{% macro kms_type() -%}
+gcp-kms
+{%- endmacro %}

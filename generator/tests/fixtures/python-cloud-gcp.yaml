@@ -1,0 +1,20 @@
+project_name: my-cloud-gcp-client
+description: Cloud/GCP demo client used in snapshot tests.
+language: python
+target: cloud
+kms: gcp
+kafka:
+  bootstrap_servers: pkc-example.us-central1.gcp.confluent.cloud:9092
+  sasl_username: EXAMPLEKAFKAUSERNAME
+  sasl_password: example-kafka-password
+schema_registry:
+  url: https://psrc-example.us-central1.gcp.confluent.cloud
+  basic_auth_user_info: SREXAMPLEKEY:srexamplesecret
+kms_params:
+  kms_key_id: projects/example/locations/global/keyRings/csfle/cryptoKeys/csfle-kek
+  client_id: "000000000000000000000"
+  client_email: csfle-demo@example.iam.gserviceaccount.com
+  private_key_id: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  private_key: "-----BEGIN PRIVATE KEY-----\\nEXAMPLEKEYDONOTUSE\\n-----END PRIVATE KEY-----\\n"
+
+uid: "0007"

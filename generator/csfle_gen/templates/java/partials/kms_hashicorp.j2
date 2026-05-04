@@ -1,0 +1,68 @@
+{% macro dependencies() -%}
+<dependency>
+    <groupId>io.confluent</groupId>
+    <artifactId>kafka-schema-registry-client-encryption-hcvault</artifactId>
+    <version>${confluent.version}</version>
+</dependency>
+{%- endmacro %}
+
+{% macro executor_params() -%}
+// Vault token is passed to the encryption rule executor so the
+// HcVaultKmsDriver can authenticate against the configured KEK URL.
+props.setProperty("rule.executors._default_.param.token.id", Config.getVaultToken());
+{%- endmacro %}
+
+{% macro config_methods() -%}
+public static String getHcVaultKmsKeyId() {
+    return getEnvOrThrow("HCVAULT_KMS_KEY_ID");
+}
+
+public static String getHcVaultKmsKeyName() {
+    return getEnvOrThrow("HCVAULT_KMS_KEY_NAME");
+}
+
+public static String getHcVaultKmsType() {
+    return getEnvOrThrow("HCVAULT_KMS_TYPE");
+}
+
+public static String getVaultAddr() {
+    return getEnvOrThrow("VAULT_ADDR");
+}
+
+public static String getVaultToken() {
+    return getEnvOrThrow("VAULT_TOKEN");
+}
+{%- endmacro %}
+
+{% macro validate_calls() -%}
+getHcVaultKmsKeyId();
+getHcVaultKmsKeyName();
+getHcVaultKmsType();
+getVaultAddr();
+getVaultToken();
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# HashiCorp Vault Configuration (for field-level encryption)
+HCVAULT_KMS_KEY_NAME={{ kek_name }}
+HCVAULT_KMS_TYPE=hcvault
+HCVAULT_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# Vault Authentication
+VAULT_ADDR={{ kms_params.vault_addr or '<FILL_ME>' }}
+VAULT_TOKEN={{ kms_params.vault_token or '<FILL_ME>' }}
+{%- endmacro %}
+
+{% macro kms_type() -%}
+hcvault
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **HashiCorp Vault** (Transit secrets engine). You'll need:
+
+* A **Vault server** reachable from this client (set `VAULT_ADDR`, e.g. `http://127.0.0.1:8200`).
+* The **Transit secrets engine** enabled, with a key created at `transit/keys/<name>`. The KEK URL is then `<VAULT_ADDR>/transit/keys/<name>` — use this as `HCVAULT_KMS_KEY_ID`.
+* A **Vault token** with `read` and `update` permissions on `transit/encrypt/<name>` and `transit/decrypt/<name>` (set `VAULT_TOKEN`).
+
+> **Note:** the `kms.type` value is `hcvault` (no `-kms` suffix), unlike the other KMS providers.
+{%- endmacro %}

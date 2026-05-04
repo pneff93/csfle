@@ -1,0 +1,59 @@
+{% macro driver_import() -%}
+"github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/rules/encryption/hcvault"
+{%- endmacro %}
+
+{% macro driver_register() -%}
+hcvault.Register()
+{%- endmacro %}
+
+{% macro rule_config_func() -%}
+// GetHcVaultRuleConfig returns the HashiCorp Vault token packaged for the Avro
+// serializer/deserializer RuleConfig. The Confluent Go hcvault driver reads
+// `token.id` from this map.
+func GetHcVaultRuleConfig() (map[string]string, error) {
+	token, err := getEnv("VAULT_TOKEN")
+	if err != nil {
+		return nil, err
+	}
+	return map[string]string{
+		"token.id": token,
+	}, nil
+}
+{%- endmacro %}
+
+{% macro rule_config_func_call() -%}
+GetHcVaultRuleConfig
+{%- endmacro %}
+
+{% macro config_validate_keys() -%}
+"HCVAULT_KMS_KEY_NAME",
+"HCVAULT_KMS_TYPE",
+"HCVAULT_KMS_KEY_ID",
+"VAULT_ADDR",
+"VAULT_TOKEN",
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# HashiCorp Vault Configuration (for field-level encryption)
+HCVAULT_KMS_KEY_NAME={{ kek_name }}
+HCVAULT_KMS_TYPE=hcvault
+HCVAULT_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# Vault Authentication
+VAULT_ADDR={{ kms_params.vault_addr or '<FILL_ME>' }}
+VAULT_TOKEN={{ kms_params.vault_token or '<FILL_ME>' }}
+{%- endmacro %}
+
+{% macro kms_type() -%}
+hcvault
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **HashiCorp Vault** (Transit secrets engine). You'll need:
+
+* A **Vault server** reachable from this client (set `VAULT_ADDR`, e.g. `http://127.0.0.1:8200`).
+* The **Transit secrets engine** enabled, with a key created at `transit/keys/<name>`. The KEK URL is then `<VAULT_ADDR>/transit/keys/<name>` — use this as `HCVAULT_KMS_KEY_ID`.
+* A **Vault token** with `read` and `update` permissions on `transit/encrypt/<name>` and `transit/decrypt/<name>` (set `VAULT_TOKEN`).
+
+> **Note:** the `kms.type` value is `hcvault` (no `-kms` suffix), unlike the other KMS providers.
+{%- endmacro %}

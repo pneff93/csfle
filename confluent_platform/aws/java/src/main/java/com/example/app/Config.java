@@ -4,7 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class Config {
     private static final Dotenv dotenv = Dotenv.configure()
-        .directory("../../")  // Load from parent directory (aws/)
+        .directory("../")  // Load from parent directory (aws/) — relative to mvn cwd (aws/java)
         .ignoreIfMissing()
         .load();
 

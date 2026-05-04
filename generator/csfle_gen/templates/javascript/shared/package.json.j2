@@ -1,0 +1,15 @@
+{
+  "name": "{{ project_name }}",
+  "version": "1.0.0",
+  "private": true,
+  "description": "{{ description or 'CSFLE demo client' }}",
+  "scripts": {
+    "produce": "node producer.js",
+    "consume": "node consumer.js"
+  },
+  "dependencies": {
+    "@confluentinc/kafka-javascript": "^{{ confluent_js_version }}",
+    "@confluentinc/schemaregistry": "^{{ confluent_js_version }}",
+    "dotenv": "^17.4.2"
+  }
+}

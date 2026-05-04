@@ -3,3 +3,16 @@
 .idea/
 .DS_Store
 venv/
+
+CLAUDE.md
+
+# Generator output
+generated/
+
+# Python tooling for the generator
+generator/.venv/
+generator/__pycache__/
+generator/**/__pycache__/
+generator/.pytest_cache/
+generator/.coverage
+generator/.env

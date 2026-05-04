@@ -1,0 +1,41 @@
+{% macro producer_config_extras() -%}
+SecurityProtocol = SecurityProtocol.SaslSsl,
+SaslMechanism = SaslMechanism.Plain,
+SaslUsername = AppConfig.KafkaSaslUsername,
+SaslPassword = AppConfig.KafkaSaslPassword,
+{%- endmacro %}
+
+{% macro sr_config_extras() -%}
+BasicAuthCredentialsSource = AuthCredentialsSource.UserInfo,
+BasicAuthUserInfo = AppConfig.SchemaRegistryBasicAuthUserInfo,
+{%- endmacro %}
+
+{% macro config_validate_keys() -%}
+"KAFKA_SASL_USERNAME",
+"KAFKA_SASL_PASSWORD",
+"SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO",
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# Kafka Configuration (Confluent Cloud)
+KAFKA_BOOTSTRAP_SERVERS={{ kafka.bootstrap_servers }}
+KAFKA_SASL_USERNAME={{ kafka.sasl_username or '<FILL_ME>' }}
+KAFKA_SASL_PASSWORD={{ kafka.sasl_password or '<FILL_ME>' }}
+
+# Schema Registry Configuration (Confluent Cloud)
+SCHEMA_REGISTRY_URL={{ schema_registry.url }}
+SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO={{ schema_registry.basic_auth_user_info or '<FILL_ME>' }}
+{%- endmacro %}
+
+{% macro readme_section() -%}
+### 4. Confluent Cloud Setup
+
+This client targets a **Confluent Cloud** cluster with **Advanced Stream Governance** enabled (required for CSFLE).
+
+In the Confluent Cloud UI, you'll need to:
+
+1. Create a Kafka cluster and an API key/secret pair (used as `KAFKA_SASL_USERNAME` / `KAFKA_SASL_PASSWORD`).
+2. Note the bootstrap server URL (used as `KAFKA_BOOTSTRAP_SERVERS`).
+3. Enable Schema Registry, then create a Schema Registry API key/secret. Concatenate them as `key:secret` for `SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO`.
+4. Define a tag named `PII` in the Schema Registry tag catalog before running `./bootstrap.sh`.
+{%- endmacro %}

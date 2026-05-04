@@ -1,0 +1,32 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.example.app" level="INFO"/>
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="io.confluent" level="WARN"/>
+
+    <!-- Suppress the CSFLE rule executor's verbose decrypt-failure logging.
+         When the rule has OnFailure=NONE (read failures), the executor still
+         logs a WARN with a full stack trace BEFORE swallowing the error.
+         Silenced here so the unauthorized-access demo output stays clean.
+         Re-enable by removing these two lines if you need to debug a rule. -->
+    <logger name="io.confluent.kafka.schemaregistry.encryption.tink" level="ERROR"/>
+    <logger name="io.confluent.kafka.schemaregistry.rules" level="ERROR"/>
+
+    <!-- Silence Azure Identity SDK auth-retry noise. With invalid credentials
+         these loggers emit ERROR-level messages on every retry attempt (and
+         the SDK retries several times before giving up). The rule executor's
+         OnFailure=NONE handling still fires; producer-side encrypt errors
+         still propagate via the application's own catch block. -->
+    <logger name="com.azure.identity" level="OFF"/>
+    <logger name="com.azure.core.implementation" level="OFF"/>
+    <logger name="com.microsoft.aad" level="OFF"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

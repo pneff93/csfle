@@ -1,0 +1,92 @@
+{% macro dependencies() -%}
+<dependency>
+    <groupId>io.confluent</groupId>
+    <artifactId>kafka-schema-registry-client-encryption-gcp</artifactId>
+    <version>${confluent.version}</version>
+</dependency>
+{%- endmacro %}
+
+{% macro executor_params() -%}
+// GCP service-account fields are passed to the encryption rule executor so
+// the GcpKmsDriver can construct service-account credentials.
+props.setProperty("rule.executors._default_.param.client.id", Config.getGcpClientId());
+props.setProperty("rule.executors._default_.param.client.email", Config.getGcpClientEmail());
+props.setProperty("rule.executors._default_.param.private.key.id", Config.getGcpPrivateKeyId());
+props.setProperty("rule.executors._default_.param.private.key", Config.getGcpPrivateKey());
+{%- endmacro %}
+
+{% macro config_methods() -%}
+public static String getGcpKmsKeyId() {
+    return getEnvOrThrow("GCP_KMS_KEY_ID");
+}
+
+public static String getGcpKmsKeyName() {
+    return getEnvOrThrow("GCP_KMS_KEY_NAME");
+}
+
+public static String getGcpKmsType() {
+    return getEnvOrThrow("GCP_KMS_TYPE");
+}
+
+public static String getGcpClientId() {
+    return getEnvOrThrow("GCP_CLIENT_ID");
+}
+
+public static String getGcpClientEmail() {
+    return getEnvOrThrow("GCP_CLIENT_EMAIL");
+}
+
+public static String getGcpPrivateKeyId() {
+    return getEnvOrThrow("GCP_PRIVATE_KEY_ID");
+}
+
+public static String getGcpPrivateKey() {
+    // dotenv-java doesn't expand `\n` escapes inside .env values like python-dotenv does,
+    // so a private key copied from a service-account JSON file (where newlines are encoded
+    // as the two-character sequence `\` + `n`) reaches us unchanged. Convert here so the
+    // GCP auth library sees a real PEM with newlines.
+    return getEnvOrThrow("GCP_PRIVATE_KEY").replace("\\n", "\n");
+}
+{%- endmacro %}
+
+{% macro validate_calls() -%}
+getGcpKmsKeyId();
+getGcpKmsKeyName();
+getGcpKmsType();
+getGcpClientId();
+getGcpClientEmail();
+getGcpPrivateKeyId();
+getGcpPrivateKey();
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# Google Cloud KMS Configuration (for field-level encryption)
+GCP_KMS_KEY_NAME={{ kek_name }}
+GCP_KMS_TYPE=gcp-kms
+GCP_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# Google Cloud Service Account fields (extracted from the SA JSON file)
+GCP_CLIENT_ID={{ kms_params.client_id or '<FILL_ME>' }}
+GCP_CLIENT_EMAIL={{ kms_params.client_email or '<FILL_ME>' }}
+GCP_PRIVATE_KEY_ID={{ kms_params.private_key_id or '<FILL_ME>' }}
+# Single-line PEM with literal `\n` escapes; the surrounding double quotes are required so
+# dotenv-java treats this as one string value (otherwise stray content on the next line can
+# leak in). The Config.getGcpPrivateKey() getter converts `\n` to real newlines at read time.
+GCP_PRIVATE_KEY="{{ kms_params.private_key or '<FILL_ME>' }}"
+{%- endmacro %}
+
+{% macro kms_type() -%}
+gcp-kms
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **Google Cloud KMS**. You'll need:
+
+* A **Google Cloud KMS keyring + key** (the KEK). The resource ID has the form `projects/<project>/locations/<loc>/keyRings/<ring>/cryptoKeys/<key>`.
+* A **service account** with `Cloud KMS CryptoKey Encrypter/Decrypter` role on that key.
+* The service account's JSON key file. Open it and copy the four fields `client_id`, `client_email`, `private_key_id`, and `private_key` into your `.env`.
+
+> ⚠️ **Do not append `/cryptoKeyVersions/N`** to `GCP_KMS_KEY_ID`. Version-scoped resources are encrypt-only and CSFLE will fail on the very first produce when it tries to decrypt the DEK. Use the `cryptoKey` itself.
+
+> **Note on `GCP_PRIVATE_KEY`:** the value is a multi-line PEM string with literal `\n` escapes. Wrap it in double quotes in `.env` so dotenv-java preserves the newlines.
+{%- endmacro %}

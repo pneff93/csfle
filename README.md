@@ -8,6 +8,57 @@ Encrypt sensitive data at the source before it ever reaches Kafka, ensuring end-
 
 ---
 
+## ⚙️ Generator
+
+Want to scaffold a new CSFLE client without copy-pasting? Run the interactive generator from [`generator/`](generator/README.md):
+
+* Supported clients: Python, Java, Javascript, Go, .NET
+* Supported KMS: AWS, Azure, GCP, Hashicorp Vault
+* Supports Confluent Cloud and Confluent Platform
+
+```shell
+cd generator
+uv run csfle-gen new
+```
+
+It asks a series of questions about your KMS provider and Confluent target, then writes a ready-to-run client under `generated/<project_name>/`.
+
+The producer will generate 20 messages with the following AVRO schema. The birthday field will be encrypted.
+
+```json
+{
+  "name": "PersonalData",
+  "type": "record",
+  "namespace": "com.csfleExample",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "birthday",
+      "type": "string",
+      "confluent:tags": [
+        "PII"
+      ]
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  ]
+}
+```
+
+---
+
 ## ☁️ Confluent Cloud Examples
 
 Step-by-step guidelines for different KMS integrations with Confluent Cloud:
@@ -34,7 +85,14 @@ Step-by-step guidelines for different KMS integrations with Confluent Platform:
 |---------------------------------------------------------|------------|----------------------------|---------------------|----------------|
 | [AWS](confluent_platform/aws/java/README.md)            | Java       | AWS Key Management Service | CSFLE               | ❌             |
 | [AWS](confluent_platform/aws/python/README.md)          | Python     | AWS Key Management Service | CSFLE               | ❌             |
+| [AWS](confluent_platform/aws/dotnet/README.md)          | .NET       | AWS Key Management Service | CSFLE               | ❌             |
+| [AWS](confluent_platform/aws/go/README.md)              | Go         | AWS Key Management Service | CSFLE               | ❌             |
+| [AWS](confluent_platform/aws/javascript/README.md)      | JavaScript | AWS Key Management Service | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/java/README.md)        | Java       | Azure Key Vault            | CSFLE               | ❌             |
 | [Azure](confluent_platform/azure/python/README.md)      | Python     | Azure Key Vault            | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/dotnet/README.md)      | .NET       | Azure Key Vault            | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/go/README.md)          | Go         | Azure Key Vault            | CSFLE               | ❌             |
+| [Azure](confluent_platform/azure/javascript/README.md)  | JavaScript | Azure Key Vault            | CSFLE               | ❌             |
 
 ---
 

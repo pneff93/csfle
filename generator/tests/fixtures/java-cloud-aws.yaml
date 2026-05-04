@@ -1,0 +1,18 @@
+project_name: my-cloud-aws-java-client
+description: Cloud/AWS Java demo client used in snapshot tests.
+language: java
+target: cloud
+kms: aws
+kafka:
+  bootstrap_servers: pkc-example.us-east-1.aws.confluent.cloud:9092
+  sasl_username: EXAMPLEKAFKAUSERNAME
+  sasl_password: example-kafka-password
+schema_registry:
+  url: https://psrc-example.us-east-2.aws.confluent.cloud
+  basic_auth_user_info: SREXAMPLEKEY:srexamplesecret
+kms_params:
+  kms_key_id: arn:aws:kms:us-east-1:000000000000:key/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+  access_key_id: AKIAIOSFODNN7EXAMPLE
+  secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+uid: "0013"

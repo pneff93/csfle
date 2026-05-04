@@ -1,0 +1,69 @@
+{% macro dependencies() -%}
+<dependency>
+    <groupId>io.confluent</groupId>
+    <artifactId>kafka-schema-registry-client-encryption-aws</artifactId>
+    <version>${confluent.version}</version>
+</dependency>
+{%- endmacro %}
+
+{% macro executor_params() -%}
+// AWS credentials are passed to the encryption rule executor so the
+// AwsKmsDriver can construct an AWSCredentials instance.
+props.setProperty("rule.executors._default_.param.access.key.id", Config.getAwsAccessKeyId());
+props.setProperty("rule.executors._default_.param.secret.access.key", Config.getAwsSecretAccessKey());
+{%- endmacro %}
+
+{% macro config_methods() -%}
+public static String getAwsKmsKeyId() {
+    return getEnvOrThrow("AWS_KMS_KEY_ID");
+}
+
+public static String getAwsKmsKeyName() {
+    return getEnvOrThrow("AWS_KMS_KEY_NAME");
+}
+
+public static String getAwsKmsType() {
+    return getEnvOrThrow("AWS_KMS_TYPE");
+}
+
+public static String getAwsAccessKeyId() {
+    return getEnvOrThrow("AWS_ACCESS_KEY_ID");
+}
+
+public static String getAwsSecretAccessKey() {
+    return getEnvOrThrow("AWS_SECRET_ACCESS_KEY");
+}
+{%- endmacro %}
+
+{% macro validate_calls() -%}
+getAwsKmsKeyId();
+getAwsKmsKeyName();
+getAwsKmsType();
+getAwsAccessKeyId();
+getAwsSecretAccessKey();
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# AWS KMS Configuration (for field-level encryption)
+AWS_KMS_KEY_NAME={{ kek_name }}
+AWS_KMS_TYPE=aws-kms
+AWS_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# AWS Credentials
+AWS_ACCESS_KEY_ID={{ kms_params.access_key_id or '<FILL_ME>' }}
+AWS_SECRET_ACCESS_KEY={{ kms_params.secret_access_key or '<FILL_ME>' }}
+{%- endmacro %}
+
+{% macro kms_type() -%}
+aws-kms
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **AWS KMS**. You'll need:
+
+* An **AWS KMS Key** (the KEK). Note the full ARN, e.g. `arn:aws:kms:eu-central-1:123456789:key/xxx-xxx-xxx`.
+* An **IAM user or role** with `kms:Encrypt`, `kms:Decrypt`, and `kms:GenerateDataKey` permissions on that key.
+* The IAM principal's **Access Key ID** and **Secret Access Key**.
+
+The credentials from `.env` are passed to the Schema Registry rule executor so the `AwsKmsDriver` can authenticate.
+{%- endmacro %}

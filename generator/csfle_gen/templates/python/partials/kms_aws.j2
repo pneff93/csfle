@@ -1,0 +1,46 @@
+{% macro imports() -%}
+from confluent_kafka.schema_registry.rules.encryption.awskms.aws_driver import AwsKmsDriver
+{%- endmacro %}
+
+{% macro register() -%}
+AwsKmsDriver.register()
+{%- endmacro %}
+
+{% macro setup_credentials() -%}
+# AWS credentials are passed via rule.executors._default_.param.* below; this comment
+# is kept for parity with other KMS partials.
+{%- endmacro %}
+
+{% macro executor_params() -%}
+'access.key.id': os.getenv('AWS_ACCESS_KEY_ID'),
+'secret.access.key': os.getenv('AWS_SECRET_ACCESS_KEY'),
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# AWS KMS Configuration (for field-level encryption)
+AWS_KMS_KEY_NAME={{ kek_name }}
+AWS_KMS_TYPE=aws-kms
+AWS_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# AWS Credentials
+AWS_ACCESS_KEY_ID={{ kms_params.access_key_id or '<FILL_ME>' }}
+AWS_SECRET_ACCESS_KEY={{ kms_params.secret_access_key or '<FILL_ME>' }}
+{%- endmacro %}
+
+{% macro pip_deps() -%}
+confluent-kafka[avro,rules]=={{ confluent_kafka_version }}
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **AWS KMS**. You'll need:
+
+* An **AWS KMS Key** (the KEK). Note the full ARN, e.g. `arn:aws:kms:eu-central-1:123456789:key/xxx-xxx-xxx`.
+* An **IAM user or role** with `kms:Encrypt`, `kms:Decrypt`, and `kms:GenerateDataKey` permissions on that key.
+* The IAM principal's **Access Key ID** and **Secret Access Key**.
+
+Authentication uses the standard AWS credential chain — the values from `.env` are loaded into the process environment automatically.
+{%- endmacro %}
+
+{% macro kms_type() -%}
+aws-kms
+{%- endmacro %}

@@ -1,0 +1,4 @@
+{% import "python/partials/kms_" + kms + ".j2" as kms_p with context %}
+{{ kms_p.pip_deps() }}
+python-dotenv==1.2.1
+python-dateutil>=2.9.0

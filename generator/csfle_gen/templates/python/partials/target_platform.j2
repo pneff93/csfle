@@ -1,0 +1,28 @@
+{% macro kafka_config() -%}
+'bootstrap.servers': _get_env('KAFKA_BOOTSTRAP_SERVERS')
+{%- endmacro %}
+
+{% macro sr_config() -%}
+'url': _get_env('SCHEMA_REGISTRY_URL')
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# Kafka Configuration (Local Confluent Platform)
+KAFKA_BOOTSTRAP_SERVERS={{ kafka.bootstrap_servers }}
+
+# Schema Registry Configuration (Local Confluent Platform)
+SCHEMA_REGISTRY_URL={{ schema_registry.url }}
+{%- endmacro %}
+
+{% macro readme_section() -%}
+### 4. Start Confluent Platform
+
+Start the local Confluent Platform stack (broker + Schema Registry + Control Center) using Docker Compose:
+
+```shell
+cd ../../confluent_platform
+docker compose up -d
+```
+
+Wait a few seconds for all services to start. You can check the logs with `docker compose logs -f` or open [Control Center](http://localhost:9021/) in a browser.
+{%- endmacro %}

@@ -1,0 +1,44 @@
+{% macro driver_class() -%}
+AzureKmsDriver
+{%- endmacro %}
+
+{% macro rule_config() -%}
+'tenant.id': process.env.AZURE_TENANT_ID,
+'client.id': process.env.AZURE_CLIENT_ID,
+'client.secret': process.env.AZURE_CLIENT_SECRET,
+{%- endmacro %}
+
+{% macro config_validate_keys() -%}
+'AZURE_KMS_KEY_NAME',
+'AZURE_KMS_TYPE',
+'AZURE_KMS_KEY_ID',
+'AZURE_TENANT_ID',
+'AZURE_CLIENT_ID',
+'AZURE_CLIENT_SECRET',
+{%- endmacro %}
+
+{% macro env_vars() -%}
+# Azure Key Vault Configuration (for field-level encryption)
+AZURE_KMS_KEY_NAME={{ kek_name }}
+AZURE_KMS_TYPE=azure-kms
+AZURE_KMS_KEY_ID={{ kms_params.kms_key_id or '<FILL_ME>' }}
+
+# Azure Service Principal Credentials
+AZURE_TENANT_ID={{ kms_params.tenant_id or '<FILL_ME>' }}
+AZURE_CLIENT_ID={{ kms_params.client_id or '<FILL_ME>' }}
+AZURE_CLIENT_SECRET={{ kms_params.client_secret or '<FILL_ME>' }}
+{%- endmacro %}
+
+{% macro kms_type() -%}
+azure-kms
+{%- endmacro %}
+
+{% macro readme_section() -%}
+This client encrypts the `birthday` field using **Azure Key Vault**. You'll need:
+
+* An **Azure Key Vault** with an **RSA key** (the KEK). The key URL has the form `https://<vault-name>.vault.azure.net/keys/<key-name>/<version>`.
+* An **App Registration** (service principal) with `Key Vault Crypto User` role on the vault.
+* The service principal's **Tenant ID**, **Client ID**, and **Client Secret**.
+
+The credentials are passed to `AvroSerializer` / `AvroDeserializer` via `ruleConfig` so the `AzureKmsDriver` constructs a `ClientSecretCredential` deterministically (rather than relying on Azure SDK defaults).
+{%- endmacro %}

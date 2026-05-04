@@ -12,9 +12,9 @@ Encrypt sensitive data at the source before it ever reaches Kafka, ensuring end-
 
 Want to scaffold a new CSFLE client without copy-pasting? Run the interactive generator from [`generator/`](generator/README.md):
 
-Supported clients: Python, Java, Javascript, Go, .NET
-Supported KMS: AWS, Azure, GCP, Hashicorp Vault
-Supports Confluent Cloud and Confluent Platform
+* Supported clients: Python, Java, Javascript, Go, .NET
+* Supported KMS: AWS, Azure, GCP, Hashicorp Vault
+* Supports Confluent Cloud and Confluent Platform
 
 ```shell
 cd generator

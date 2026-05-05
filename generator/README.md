@@ -27,14 +27,12 @@ A self-contained project. Common to both languages:
 - `bootstrap.sh` — creates the Kafka topic and registers the schema + encryption rule
 - `.env`, `.env.example`, `README.md`
 
-Python adds `requirements.txt`; Java adds `pom.xml`, `BootstrapTopic.java`, and `src/main/resources/logback.xml`.
-
 ## Supported combinations
 
 | Target | KMS providers | Languages |
 |---|---|---|
-| Confluent Cloud | AWS, Azure, GCP, HashiCorp Vault | Python, Java |
-| Confluent Platform | AWS, Azure, GCP, HashiCorp Vault | Python, Java |
+| Confluent Cloud | AWS, Azure, GCP, HashiCorp Vault | Python, Java, Javascript, Go, .NET     |
+| Confluent Platform | AWS, Azure, GCP, HashiCorp Vault | Python, Java, Javascript, Go, .NET  |
 
 Other languages will be added as sibling template trees in future versions.
 
